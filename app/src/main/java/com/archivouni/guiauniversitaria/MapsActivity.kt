@@ -48,6 +48,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val uprBounds = LatLngBounds(LatLng(18.399495, -66.055392), LatLng(18.409678, -66.040672))
         mMap.setLatLngBoundsForCameraTarget(uprBounds)
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(upr, 16f))
+        mMap.setMinZoomPreference(15f)
     }
 
 }
