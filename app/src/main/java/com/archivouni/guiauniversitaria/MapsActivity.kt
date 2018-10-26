@@ -63,8 +63,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         updateLocationUI()
         getDeviceLocation()
 
-
-
         mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.style_json))
         points.forEach { mMap.addMarker(MarkerOptions().position(it.pos).title(it.name)) }
         val upr = LatLng(18.404123, -66.048714)
