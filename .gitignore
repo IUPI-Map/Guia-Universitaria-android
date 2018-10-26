@@ -1,3 +1,6 @@
+# API Keys
+*api.xml
+
 # Built application files
 *.apk
 *.ap_
@@ -38,6 +41,7 @@ captures/
 .idea/tasks.xml
 .idea/kotlinc.xml
 .idea/gradle.xml
+.idea/modules.xml
 .idea/assetWizardSettings.xml
 .idea/dictionaries
 .idea/libraries
