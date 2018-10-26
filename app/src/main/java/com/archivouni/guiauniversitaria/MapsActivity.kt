@@ -1,34 +1,50 @@
 package com.archivouni.guiauniversitaria
 
-import android.support.v7.app.AppCompatActivity
+import android.content.pm.PackageManager
+import android.location.Location
 import android.os.Bundle
-
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
+import android.support.v7.app.AppCompatActivity
+import android.util.Log
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
-import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
+
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+    override fun onMarkerClick(p0: Marker?) = false
+
 
     private lateinit var mMap: GoogleMap
+    private lateinit var mFusedLocationClient: FusedLocationProviderClient
+
+    private var mLocationPermissionGranted = false
+
+    private lateinit var mLastKnownLocation: Location
+
 
     data class POI(val name: String, val pos: LatLng)
 
-    var points = arrayOf(POI("Ciencias Naturales II", LatLng(18.403971, -66.046375)),
+    private var points = arrayOf(POI("Ciencias Naturales II", LatLng(18.403971, -66.046375)),
             POI("Biblioteca Jose M. Lazaro", LatLng(18.404268, -66.049842)),
             POI("Archivo Central UPRRP", LatLng(18.404100, -66.046861)))
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+
     }
 
     /**
@@ -42,6 +58,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+
+        getLocationPermission()
+        updateLocationUI()
+        getDeviceLocation()
+
+
+
         mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.style_json))
         points.forEach { mMap.addMarker(MarkerOptions().position(it.pos).title(it.name)) }
         val upr = LatLng(18.404123, -66.048714)
@@ -50,5 +73,80 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(upr, 16f))
         mMap.setMinZoomPreference(15f)
     }
+
+    private fun getLocationPermission() {
+        /*
+     * Request location permission, so that we can get the location of the
+     * device. The result of the permission request is handled by a callback,
+     * onRequestPermissionsResult.
+     */
+        if (ContextCompat.checkSelfPermission(this,
+                        android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            mLocationPermissionGranted = true
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
+                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION)
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>,
+                                            grantResults: IntArray) {
+        mLocationPermissionGranted = false
+        when (requestCode) {
+            Companion.PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION -> {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    mLocationPermissionGranted = true
+                }
+            }
+        }
+        updateLocationUI()
+    }
+
+    private fun updateLocationUI() {
+        try {
+            if (mLocationPermissionGranted) {
+                mMap.isMyLocationEnabled = true
+                mMap.uiSettings.isMyLocationButtonEnabled = true
+            } else {
+                mMap.isMyLocationEnabled = false
+                mMap.uiSettings.isMyLocationButtonEnabled = false
+                getLocationPermission()
+            }
+        } catch (e: SecurityException) {
+            Log.e("Exception: %s", e.message)
+        }
+
+    }
+
+    private fun getDeviceLocation() {
+        /*
+     * Get the best and most recent location of the device, which may be null in rare
+     * cases when a location is not available.
+     */
+        try {
+            if (mLocationPermissionGranted) {
+                val locationResult = mFusedLocationClient.lastLocation
+                locationResult.addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        mLastKnownLocation = task.result!!
+                    } else {
+                        Log.d("Map", "Current location is null. Using defaults.")
+                        Log.e("Exception: %s", task.exception.toString())
+                        mMap.uiSettings.isMyLocationButtonEnabled = false
+                    }
+                }
+            }
+        } catch (e: SecurityException) {
+            Log.e("Exception: %s", e.message)
+        }
+    }
+
+    companion object {
+        private const val PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1
+    }
+
 
 }
