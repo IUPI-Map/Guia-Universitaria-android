@@ -16,9 +16,20 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.google.android.gms.maps.model.UrlTileProvider
+import com.google.android.gms.maps.model.TileProvider
+import java.net.URL
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+
+    companion object {
+        private const val PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1
+        private const val DEFAULT_ZOOM = 16f
+        private const val MIN_ZOOM = 16f
+        private const val MAX_ZOOM = 18f
+    }
+
     override fun onMarkerClick(p0: Marker?) = false
 
     private lateinit var mMap: GoogleMap
@@ -35,6 +46,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             POI("Biblioteca Jose M. Lazaro", LatLng(18.404268, -66.049842)),
             POI("Archivo Central UPRRP", LatLng(18.404100, -66.046861)))
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
@@ -45,8 +57,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        val listButton = findViewById(R.id.list_button) as Button
-        listButton.setOnClickListener { _ ->
+        val listButton = findViewById<Button>(R.id.list_button)
+        listButton.setOnClickListener {
             startActivity(Intent(this, ListActivity::class.java))
         }
     }
@@ -63,18 +75,24 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        getLocationPermission()
-        updateLocationUI()
-        getDeviceLocation()
+//        getLocationPermission()
+//        updateLocationUI()
+//        getDeviceLocation()
 
+        mMap.mapType = GoogleMap.MAP_TYPE_NONE
         mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.style_json))
         points.forEach { mMap.addMarker(MarkerOptions().position(it.pos).title(it.name)) }
         val upr = LatLng(18.404123, -66.048714)
         val uprBounds = LatLngBounds(LatLng(18.399495, -66.055392), LatLng(18.409678, -66.040672))
         mMap.setLatLngBoundsForCameraTarget(uprBounds)
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(upr, 16f))
-        mMap.setMinZoomPreference(15f)
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(upr, DEFAULT_ZOOM))
+        mMap.setMinZoomPreference(MIN_ZOOM)
+        mMap.setMaxZoomPreference(MAX_ZOOM)
+
+        mMap.addTileOverlay(TileOverlayOptions().tileProvider(GoogleMapsTileProvider(resources.assets)))
     }
+
+
 
     private fun getLocationPermission() {
         /*
@@ -145,9 +163,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         }
     }
 
-    companion object {
-        private const val PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1
-    }
+
 
 
     //List button implementation
