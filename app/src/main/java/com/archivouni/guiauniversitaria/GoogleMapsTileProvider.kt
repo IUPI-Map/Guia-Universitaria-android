@@ -2,6 +2,7 @@ package com.archivouni.guiauniversitaria
 
 import android.content.res.AssetManager
 import android.graphics.Rect
+import android.util.Log
 import android.util.SparseArray
 import com.google.android.gms.maps.model.Tile
 import com.google.android.gms.maps.model.TileProvider
@@ -14,20 +15,25 @@ import java.io.InputStream
 class GoogleMapsTileProvider(private val mAssets: AssetManager) : TileProvider{
 
     companion object {
+        private const val TAG = "GoogleMapsTileProvider"
+
+        private const val MAP_TILES_DIRECTORY = "map_tiles_bmp"
         private const val TILE_WIDTH = 256
         private const val TILE_HEIGHT = 256
         private const val BUFFER_SIZE = 16 * 1024
         private val TILE_ZOOMS = SparseArray<Rect>().apply {
+            put(14, Rect(5185, 7339, 5186, 7339))
             put(15, Rect(10371, 14678, 10373, 14679))
-            put(16, Rect(20742, 29356, 20746, 29359))
-            put(17, Rect(41485, 58713, 41492, 58718))
+            put(16, Rect(20742, 29357, 20746, 29359))
+            put(17, Rect(41485, 58714, 41492, 58718))
             put(18, Rect(82971, 117428, 82984, 117437))
+            put(19, Rect(165942, 234855, 165968, 234875))
         }
     }
 
 
     override fun getTile(x: Int, y: Int, zoom: Int): Tile? {
-        System.out.println(y)
+        Log.d(TAG, "Getting tile at x:$x, y:$y, zoom:$zoom")
         val image = readTileImage(x, y, zoom) as ByteArray
         return if (checkTileExists(x, y, zoom)) Tile(TILE_WIDTH, TILE_HEIGHT, image) else NO_TILE
     }
@@ -71,7 +77,7 @@ class GoogleMapsTileProvider(private val mAssets: AssetManager) : TileProvider{
     }
 
     private fun getTileFilename(x: Int, y: Int, zoom: Int): String {
-        return "map_tiles/$zoom/$x/$y.png"
+        return "$MAP_TILES_DIRECTORY/$zoom/$x/$y.png"
     }
     private fun checkTileExists(x: Int, y: Int, zoom: Int): Boolean {
         val minZoom = 16

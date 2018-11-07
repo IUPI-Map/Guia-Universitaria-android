@@ -2,32 +2,38 @@ package com.archivouni.guiauniversitaria
 
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Point
 import android.location.Location
 import android.os.Bundle
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
+import android.view.View
 import android.widget.Button
+import androidx.annotation.Dimension
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
-import com.google.android.gms.maps.model.UrlTileProvider
-import com.google.android.gms.maps.model.TileProvider
-import java.net.URL
+import kotlinx.android.synthetic.main.activity_maps.*
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     companion object {
+        private const val TAG = "MapsActivity"
+
         private const val PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1
-        private const val DEFAULT_ZOOM = 16f
-        private const val MIN_ZOOM = 16f
-        private const val MAX_ZOOM = 18f
+        private const val DEFAULT_ZOOM = 16.15f
+        private const val MIN_ZOOM = 16.15f
+        private const val MAX_ZOOM = 19f
+
+        private const val UPR_BOUND_S = 18.39926710
+        private const val UPR_BOUND_W = -66.05599693
+        private const val UPR_BOUND_N = 18.41188018
+        private const val UPR_BOUND_E = -66.03826031
+
     }
 
     override fun onMarkerClick(p0: Marker?) = false
@@ -39,13 +45,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
     private lateinit var mLastKnownLocation: Location
 
-
+    // Test data, will be replaced with PointOfInterest class
     data class POI(val name: String, val pos: LatLng)
-
     private var points = arrayOf(POI("Ciencias Naturales II", LatLng(18.403971, -66.046375)),
             POI("Biblioteca Jose M. Lazaro", LatLng(18.404268, -66.049842)),
             POI("Archivo Central UPRRP", LatLng(18.404100, -66.046861)))
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,7 +87,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.style_json))
         points.forEach { mMap.addMarker(MarkerOptions().position(it.pos).title(it.name)) }
         val upr = LatLng(18.404123, -66.048714)
-        val uprBounds = LatLngBounds(LatLng(18.399495, -66.055392), LatLng(18.409678, -66.040672))
+        val uprBounds = LatLngBounds(LatLng(UPR_BOUND_S, UPR_BOUND_W), LatLng(UPR_BOUND_N, UPR_BOUND_E))
         mMap.setLatLngBoundsForCameraTarget(uprBounds)
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(upr, DEFAULT_ZOOM))
         mMap.setMinZoomPreference(MIN_ZOOM)
@@ -136,7 +140,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 getLocationPermission()
             }
         } catch (e: SecurityException) {
-            Log.e("Exception: %s", e.message)
+            Log.e(TAG, e.message)
         }
     }
 
@@ -152,14 +156,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                     if (task.isSuccessful) {
                         mLastKnownLocation = task.result!!
                     } else {
-                        Log.d("Map", "Current location is null. Using defaults.")
-                        Log.e("Exception: %s", task.exception.toString())
+                        Log.d(TAG, "Current location is null. Using defaults.")
+                        Log.e(TAG, task.exception.toString())
                         mMap.uiSettings.isMyLocationButtonEnabled = false
                     }
                 }
             }
         } catch (e: SecurityException) {
-            Log.e("Exception: %s", e.message)
+            Log.e(TAG, e.message)
         }
     }
 
