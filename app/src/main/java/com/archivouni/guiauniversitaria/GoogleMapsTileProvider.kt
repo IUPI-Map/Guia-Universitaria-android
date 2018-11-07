@@ -4,13 +4,14 @@ import android.content.res.AssetManager
 import android.graphics.Rect
 import android.util.Log
 import android.util.SparseArray
+import com.archivouni.guiauniversitaria.MapsActivity.Companion.MAX_ZOOM
+import com.archivouni.guiauniversitaria.MapsActivity.Companion.MIN_ZOOM
 import com.google.android.gms.maps.model.Tile
 import com.google.android.gms.maps.model.TileProvider
 import com.google.android.gms.maps.model.TileProvider.NO_TILE
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.InputStream
-
 
 class GoogleMapsTileProvider(private val mAssets: AssetManager) : TileProvider{
 
@@ -38,6 +39,9 @@ class GoogleMapsTileProvider(private val mAssets: AssetManager) : TileProvider{
         return if (checkTileExists(x, y, zoom)) Tile(TILE_WIDTH, TILE_HEIGHT, image) else NO_TILE
     }
 
+    /**
+     * Loads map tile image from assets folder and converts to ByteArray
+     */
     private fun readTileImage(x: Int, y: Int, zoom: Int): ByteArray? {
         var inStream: InputStream? = null
         var buffer: ByteArrayOutputStream? = null
@@ -80,9 +84,7 @@ class GoogleMapsTileProvider(private val mAssets: AssetManager) : TileProvider{
         return "$MAP_TILES_DIRECTORY/$zoom/$x/$y.png"
     }
     private fun checkTileExists(x: Int, y: Int, zoom: Int): Boolean {
-        val minZoom = 16
-        val maxZoom = 18
         val b = TILE_ZOOMS.get(zoom)
-        return if (b == null && !(zoom < minZoom || zoom > maxZoom)) false else (b.left <= x && x <= b.right && b.top <= y && y <= b.bottom)
+        return if (b == null && !(zoom < MIN_ZOOM || zoom > MAX_ZOOM)) false else (b.left <= x && x <= b.right && b.top <= y && y <= b.bottom)
     }
 }

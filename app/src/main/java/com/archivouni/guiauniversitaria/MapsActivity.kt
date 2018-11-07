@@ -2,22 +2,20 @@ package com.archivouni.guiauniversitaria
 
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Point
 import android.location.Location
 import android.os.Bundle
+import android.util.Log
+import android.widget.Button
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.appcompat.app.AppCompatActivity
-import android.util.Log
-import android.view.View
-import android.widget.Button
-import androidx.annotation.Dimension
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.*
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
-import kotlinx.android.synthetic.main.activity_maps.*
-
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
@@ -26,8 +24,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
         private const val PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1
         private const val DEFAULT_ZOOM = 16.15f
-        private const val MIN_ZOOM = 16.15f
-        private const val MAX_ZOOM = 19f
+        const val MIN_ZOOM = 16.15f
+        const val MAX_ZOOM = 19f
 
         private const val UPR_BOUND_S = 18.39926710
         private const val UPR_BOUND_W = -66.05599693
@@ -83,6 +81,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 //        updateLocationUI()
 //        getDeviceLocation()
 
+
         mMap.mapType = GoogleMap.MAP_TYPE_NONE
         mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.style_json))
         points.forEach { mMap.addMarker(MarkerOptions().position(it.pos).title(it.name)) }
@@ -95,8 +94,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
         mMap.addTileOverlay(TileOverlayOptions().tileProvider(GoogleMapsTileProvider(resources.assets)))
     }
-
-
 
     private fun getLocationPermission() {
         /*
@@ -166,11 +163,5 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             Log.e(TAG, e.message)
         }
     }
-
-
-
-
-    //List button implementation
-
 
 }
