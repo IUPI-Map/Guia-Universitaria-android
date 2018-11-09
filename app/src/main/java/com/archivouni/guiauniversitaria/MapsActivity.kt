@@ -4,11 +4,11 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import android.widget.Button
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -17,8 +17,23 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 
-
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+
+    companion object {
+        private const val TAG = "MapsActivity"
+
+        private const val PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1
+        private const val DEFAULT_ZOOM = 16.15f
+        const val MIN_ZOOM = 16.15f
+        const val MAX_ZOOM = 19f
+
+        private const val UPR_BOUND_S = 18.39926710
+        private const val UPR_BOUND_W = -66.05599693
+        private const val UPR_BOUND_N = 18.41188018
+        private const val UPR_BOUND_E = -66.03826031
+
+    }
+
     override fun onMarkerClick(p0: Marker?) = false
 
     private lateinit var mMap: GoogleMap
@@ -28,9 +43,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
     private lateinit var mLastKnownLocation: Location
 
-
+    // Test data, will be replaced with PointOfInterest class
     data class POI(val name: String, val pos: LatLng)
-
     private var points = arrayOf(POI("Ciencias Naturales II", LatLng(18.403971, -66.046375)),
             POI("Biblioteca Jose M. Lazaro", LatLng(18.404268, -66.049842)),
             POI("Archivo Central UPRRP", LatLng(18.404100, -66.046861)))
@@ -45,8 +59,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        val listButton = findViewById(R.id.list_button) as Button
-        listButton.setOnClickListener { _ ->
+        val listButton = findViewById<Button>(R.id.list_button)
+        listButton.setOnClickListener {
             startActivity(Intent(this, ListActivity::class.java))
         }
     }
@@ -63,17 +77,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        getLocationPermission()
-        updateLocationUI()
-        getDeviceLocation()
+//        getLocationPermission()
+//        updateLocationUI()
+//        getDeviceLocation()
 
+
+        mMap.mapType = GoogleMap.MAP_TYPE_NONE
         mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.style_json))
         points.forEach { mMap.addMarker(MarkerOptions().position(it.pos).title(it.name)) }
         val upr = LatLng(18.404123, -66.048714)
-        val uprBounds = LatLngBounds(LatLng(18.399495, -66.055392), LatLng(18.409678, -66.040672))
+        val uprBounds = LatLngBounds(LatLng(UPR_BOUND_S, UPR_BOUND_W), LatLng(UPR_BOUND_N, UPR_BOUND_E))
         mMap.setLatLngBoundsForCameraTarget(uprBounds)
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(upr, 16f))
-        mMap.setMinZoomPreference(15f)
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(upr, DEFAULT_ZOOM))
+        mMap.setMinZoomPreference(MIN_ZOOM)
+        mMap.setMaxZoomPreference(MAX_ZOOM)
+
+        mMap.addTileOverlay(TileOverlayOptions().tileProvider(GoogleMapsTileProvider(resources.assets)))
     }
 
     private fun getLocationPermission() {
@@ -118,7 +137,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 getLocationPermission()
             }
         } catch (e: SecurityException) {
-            Log.e("Exception: %s", e.message)
+            Log.e(TAG, e.message)
         }
     }
 
@@ -134,23 +153,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                     if (task.isSuccessful) {
                         mLastKnownLocation = task.result!!
                     } else {
-                        Log.d("Map", "Current location is null. Using defaults.")
-                        Log.e("Exception: %s", task.exception.toString())
+                        Log.d(TAG, "Current location is null. Using defaults.")
+                        Log.e(TAG, task.exception.toString())
                         mMap.uiSettings.isMyLocationButtonEnabled = false
                     }
                 }
             }
         } catch (e: SecurityException) {
-            Log.e("Exception: %s", e.message)
+            Log.e(TAG, e.message)
         }
     }
-
-    companion object {
-        private const val PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1
-    }
-
-
-    //List button implementation
-
 
 }
