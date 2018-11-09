@@ -1,9 +1,9 @@
 package com.archivouni.guiauniversitaria
 
+import android.app.SearchManager
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -21,7 +21,13 @@ class ListActivity : AppCompatActivity(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_list)
+        setContentView(R.layout.list_view)
+
+        if (Intent.ACTION_SEARCH == intent.action) {
+            intent.getStringExtra(SearchManager.QUERY)?.also { query ->
+                TODO("SEARCH FUNCTION GOES HERE")
+            }
+        }
 
         viewManager = LinearLayoutManager(this)
         viewAdapter = ListAdapter(poiList)
@@ -31,5 +37,8 @@ class ListActivity : AppCompatActivity(){
             layoutManager = viewManager
             adapter = viewAdapter
         }
+
+        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
+
     }
 }
