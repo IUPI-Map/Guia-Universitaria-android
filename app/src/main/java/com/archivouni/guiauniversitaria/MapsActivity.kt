@@ -1,21 +1,16 @@
 package com.archivouni.guiauniversitaria
 
-import android.app.ListActivity
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.widget.Button
 import android.widget.SearchView
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -24,8 +19,6 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import kotlinx.android.synthetic.main.activity_main.*
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
@@ -37,11 +30,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         const val MIN_ZOOM = 16.15f
         const val MAX_ZOOM = 19f
 
-        private const val UPR_BOUND_S = 18.39926710
-        private const val UPR_BOUND_W = -66.05599693
-        private const val UPR_BOUND_N = 18.41188018
-        private const val UPR_BOUND_E = -66.03826031
-
+        const val UPR_BOUND_S = 18.39926710
+        const val UPR_BOUND_W = -66.05599693
+        const val UPR_BOUND_N = 18.41188018
+        const val UPR_BOUND_E = -66.03826031
     }
 
     override fun onMarkerClick(p0: Marker?) = false
@@ -53,20 +45,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
     private lateinit var mLastKnownLocation: Location
 
-    private lateinit var mListView: ConstraintLayout
-    private lateinit var mListViewBehavior: BottomSheetBehavior<ConstraintLayout>
+    private lateinit var mListView: View
+    private lateinit var mListViewBehavior: BottomSheetBehavior<*>
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var viewAdapter: RecyclerView.Adapter<*>
+    private var viewAdapter: RecyclerView.Adapter<*>? = null
     private lateinit var viewManager: RecyclerView.LayoutManager
 
-
-    // Test data, will be replaced with PointOfInterest class
-    data class POI(val name: String, val pos: LatLng)
-    private var points = arrayOf(POI("Ciencias Naturales II", LatLng(18.403971, -66.046375)),
-            POI("Biblioteca Jose M. Lazaro", LatLng(18.404268, -66.049842)),
-            POI("Archivo Central UPRRP", LatLng(18.404100, -66.046861)))
-
+    // TODO: Remove once SQLite is functional
     val poiList = arrayOf(PointOfInterest("Ciencias Naturales II", "CN", LatLng(18.403971, -66.046375)),
             PointOfInterest("Biblioteca Jose M. Lazaro", "1", LatLng(18.404268, -66.049842)),
             PointOfInterest("Archivo Central UPRRP", "2", LatLng(18.404100, -66.046861)),
@@ -86,32 +72,28 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
 
-        mListView = findViewById(R.id.list_view)
-
-        mListViewBehavior = BottomSheetBehavior.from(mListView)
-        mListViewBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-
+        /*****************MAP LOGIC BEGINS**********************/
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
+        /*****************BOTTOM_SHEET BEGINS**********************/
+        mListView = findViewById(R.id.list_view)
+        mListViewBehavior = BottomSheetBehavior.from(mListView)
+        mListViewBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+
+        /*****************SEARCH_BUTTON BEGINS**********************/
         val searchButton = findViewById<View>(R.id.search_button)
-        searchButton.setOnClickListener { _ ->
+        searchButton.setOnClickListener {
+            // Open list view on click
             mListViewBehavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
 
-        val layoutInflater = LayoutInflater.from(this)
-//        val listLayout = layoutInflater.inflate(R.layout.list_view, )
+        /*****************SEARCH_BAR BEGINS**********************/
         val searchBar = findViewById<SearchView>(R.id.search_bar)
-        searchBar.setOnQueryTextFocusChangeListener { v, hasFocus ->
-            if(hasFocus) {
-                mListViewBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-            } else {
-                mListViewBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-            }
-        }
+        // TODO: Implement search logic here
     }
 
     /**
@@ -126,30 +108,46 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
+        /*****************RECYCLER_VIEW BEGINS**********************/
+        /**
+         * Recycler view is initialized here because ListAdapter requires that the map be
+         * initialized in order to bind list items to their position on the map.
+         */
+        viewManager = LinearLayoutManager(this)
+        viewAdapter = ListAdapter(poiList, mMap, mListViewBehavior)
+        recyclerView = findViewById<RecyclerView>(R.id.recycler_view_list).apply {
+            // Recycler view options
+            setHasFixedSize(true)
+            layoutManager = viewManager
+            adapter = viewAdapter
+        }
+
+        /*****************MY_LOCATION LOGIC BEGINS**********************/
+//        TODO: Change from get_last_location to get_location_updates
 //        getLocationPermission()
 //        updateLocationUI()
 //        getDeviceLocation()
 
-
+        /*****************MAP_OPTIONS BEGINS**********************/
+        // Start with empty map
         mMap.mapType = GoogleMap.MAP_TYPE_NONE
-        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.style_json))
-        points.forEach { mMap.addMarker(MarkerOptions().position(it.pos).title(it.name)) }
-        val upr = LatLng(18.404123, -66.048714)
+        // Add tile overlay
+        mMap.addTileOverlay(TileOverlayOptions().tileProvider(GoogleMapsTileProvider(resources.assets)))
+        // Set bounds for camera
         val uprBounds = LatLngBounds(LatLng(UPR_BOUND_S, UPR_BOUND_W), LatLng(UPR_BOUND_N, UPR_BOUND_E))
         mMap.setLatLngBoundsForCameraTarget(uprBounds)
+        // Open camera at LatLng specified by upr
+        val upr = LatLng(18.404123, -66.048714)
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(upr, DEFAULT_ZOOM))
+        // Limit zoom
         mMap.setMinZoomPreference(MIN_ZOOM)
         mMap.setMaxZoomPreference(MAX_ZOOM)
-
-        mMap.addTileOverlay(TileOverlayOptions().tileProvider(GoogleMapsTileProvider(resources.assets)))
-
-        viewManager = LinearLayoutManager(this)
-        viewAdapter = ListAdapter(poiList, mMap)
-
-        recyclerView = findViewById<RecyclerView>(R.id.recycler_view_list).apply {
-            setHasFixedSize(true)
-            layoutManager = viewManager
-            adapter = viewAdapter
+        // Add markers to map
+        // TODO: Implement using SQLite
+        poiList.forEach {
+            if (it.mLatLng != null) {
+                mMap.addMarker(MarkerOptions().position(it.mLatLng).title(it.mName))
+            }
         }
     }
 
@@ -221,5 +219,4 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             Log.e(TAG, e.message)
         }
     }
-
 }

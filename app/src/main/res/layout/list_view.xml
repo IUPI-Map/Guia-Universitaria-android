@@ -25,7 +25,8 @@
             android:layout_margin="8dp"
             android:layout_above="@id/map"
             android:background="@color/colorItem"
-            android:queryHint="Search here" />
+            android:queryHint="Search here"
+            />
 
     </androidx.appcompat.widget.Toolbar>
 

@@ -8,13 +8,15 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.model.LatLng
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 
 //This Class is in charged of displaying the list_item_poi
-class ListAdapter(private val mData: Array<PointOfInterest>, private val mMap: GoogleMap): RecyclerView.Adapter<ListAdapter.POIViewHolder>() {
+class ListAdapter(private val mData: Array<PointOfInterest>, private val mMap: GoogleMap, private val mBottomSheetBehavior: BottomSheetBehavior<*>): RecyclerView.Adapter<ListAdapter.POIViewHolder>() {
 
     companion object {
         private const val TAG = "ListAdapter"
+
+        private const val ON_CLICK_ZOOM = 17.5f
     }
 
     class POIViewHolder(poiView: View): RecyclerView.ViewHolder(poiView) {
@@ -33,19 +35,20 @@ class ListAdapter(private val mData: Array<PointOfInterest>, private val mMap: G
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): POIViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
-        val cellForRow = layoutInflater.inflate(R.layout.list_item_poi, parent, false)
-        cellForRow.setOnClickListener {
-//            mMap.animateCamera(CameraUpdateFactory.newLatLng())
-        }
-        return POIViewHolder(cellForRow)
+        val listItem = layoutInflater.inflate(R.layout.list_item_poi, parent, false)
+        return POIViewHolder(listItem)
     }
 
     // Binds data to view when it becomes available
     override fun onBindViewHolder(viewHolder: POIViewHolder, pos: Int) {
         viewHolder.nameView?.text = mData[pos].mName
         viewHolder.acronymView?.text = mData[pos].mAcronym
-        viewHolder.itemView.setOnClickListener {
-            mMap.animateCamera(CameraUpdateFactory.newLatLng(mData[pos].mPos))
+        if (mData[pos].mLatLng != null) {
+            viewHolder.itemView.setOnClickListener {
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mData[pos].mLatLng, ON_CLICK_ZOOM))
+                mBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                // TODO: Open information view for point of interest
+            }
         }
         Log.d(TAG, "Binding ${mData[pos].mName} to pos: $pos\n" +
                 "Result: ${viewHolder.nameView?.text}")
