@@ -9,7 +9,6 @@
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -34,21 +33,13 @@
 
         <activity
             android:name=".MapsActivity"
-            android:label="@string/title_activity_maps"
-            android:theme="@style/Theme.AppCompat.NoActionBar">
+            android:label="@string/title_activity_maps" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <activity
-            android:name=".ListActivity"
-            android:label="Structure Information"
-            android:launchMode="singleTop"
-            android:parentActivityName=".MapsActivity">
         </activity>
 
     </application>
