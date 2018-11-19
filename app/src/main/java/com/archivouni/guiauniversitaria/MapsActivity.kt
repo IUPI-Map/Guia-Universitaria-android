@@ -25,7 +25,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     companion object {
         private const val TAG = "MapsActivity"
 
+        private const val IMAGE_SERVER_URL = "http://ec2-18-220-11-214.us-east-2.compute.amazonaws.com/"
+
         private const val PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1
+
         private const val DEFAULT_ZOOM = 16.15f
         const val MIN_ZOOM = 16.15f
         const val MAX_ZOOM = 19f
