@@ -11,6 +11,4 @@
 
     <include layout="@layout/list_view" />
 
-
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
