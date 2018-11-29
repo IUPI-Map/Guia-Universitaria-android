@@ -11,7 +11,7 @@ import org.json.JSONObject
  *      data: array of PointOfInterest objects
  */
 class Response(json: String): JSONArray(json) {
-    val data = this.let { 0.until(it.length()).map { i -> it.optJSONObject(i) } }
+    val data = this.let { 0.until(it.length()).map { i -> it.getJSONObject(i) } }
             .map { PointOfInterest(it.toString()) }.toTypedArray()
 }
 
@@ -46,18 +46,18 @@ class PointOfInterest(json: String): JSONObject(json) {
         }
     }
 
-    val id: Int = this.optInt(TAG_ID)
-    val type = when(this.optString(TAG_TYPE)) {
+    val id: Int = this.getInt(TAG_ID)
+    val type = when(this.getString(TAG_TYPE)) {
         "building" -> TYPE.BUILDING
         "artwork" -> TYPE.ARTWORK
         else -> TYPE.DEFAULT
     }
-    val name: String? = this.optString(TAG_NAME)
-    val description: String? = this.optString(TAG_DESCRIPTION)
-    val acronym: String? = this.optString(TAG_ACRONYM)
-    val latLng: LatLng? = LatLng(this.optDouble(TAG_LATITUDE), this.optDouble(TAG_LONGITUDE))
+    val name: String? = if(this.getString(TAG_NAME) != "null") this.getString(TAG_NAME) else null
+    val description: String? = if(this.getString(TAG_DESCRIPTION) != "null") this.getString(TAG_DESCRIPTION) else null
+    val acronym: String? = if(this.getString(TAG_ACRONYM) != "null") this.getString(TAG_ACRONYM) else null
+    val latLng: LatLng? = LatLng(this.getDouble(TAG_LATITUDE), this.getDouble(TAG_LONGITUDE))
     // Convert JSONArray to array of strings
-    val images = this.optJSONArray(TAG_IMAGES).let {
+    val images = this.getJSONArray(TAG_IMAGES).let {
         Array(it.length()) { i ->
             it[i].toString()
         }

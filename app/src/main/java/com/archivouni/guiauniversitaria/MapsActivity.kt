@@ -142,7 +142,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         mMap.setMinZoomPreference(MIN_ZOOM)
         mMap.setMaxZoomPreference(MAX_ZOOM)
         // Add markers to map
-        // TODO: Implement using SQLite
         data.forEach {
             if (it.latLng != null) {
                 mMap.addMarker(MarkerOptions().position(it.latLng).title(it.name))

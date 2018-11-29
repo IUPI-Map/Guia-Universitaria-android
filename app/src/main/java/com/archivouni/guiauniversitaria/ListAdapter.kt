@@ -42,7 +42,7 @@ class ListAdapter(private val mData: Array<PointOfInterest>, private val mMap: G
     // Binds data to view when it becomes available
     override fun onBindViewHolder(viewHolder: POIViewHolder, pos: Int) {
         viewHolder.nameView?.text = mData[pos].name
-        viewHolder.acronymView?.text = mData[pos].acronym
+        viewHolder.acronymView?.text = if (mData[pos].acronym != null) mData[pos].acronym else ""
         if (mData[pos].latLng != null) {
             viewHolder.itemView.setOnClickListener {
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mData[pos].latLng, ON_CLICK_ZOOM))
