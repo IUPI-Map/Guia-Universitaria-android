@@ -41,16 +41,16 @@ class ListAdapter(private val mData: Array<PointOfInterest>, private val mMap: G
 
     // Binds data to view when it becomes available
     override fun onBindViewHolder(viewHolder: POIViewHolder, pos: Int) {
-        viewHolder.nameView?.text = mData[pos].mName
-        viewHolder.acronymView?.text = mData[pos].mAcronym
-        if (mData[pos].mLatLng != null) {
+        viewHolder.nameView?.text = mData[pos].name
+        viewHolder.acronymView?.text = if (mData[pos].acronym != null) mData[pos].acronym else ""
+        if (mData[pos].latLng != null) {
             viewHolder.itemView.setOnClickListener {
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mData[pos].mLatLng, ON_CLICK_ZOOM))
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mData[pos].latLng, ON_CLICK_ZOOM))
                 mBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
                 // TODO: Open information view for point of interest
             }
         }
-        Log.d(TAG, "Binding ${mData[pos].mName} to pos: $pos\n" +
+        Log.d(TAG, "Binding ${mData[pos].name} to pos: $pos\n" +
                 "Result: ${viewHolder.nameView?.text}")
     }
 }
