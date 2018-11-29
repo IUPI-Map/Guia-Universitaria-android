@@ -1,8 +1,10 @@
 package com.archivouni.guiauniversitaria
 
 import android.content.pm.PackageManager
+import android.content.res.Resources
 import android.location.Location
 import android.os.Bundle
+import android.util.JsonReader
 import android.util.Log
 import android.view.View
 import android.widget.SearchView
@@ -11,6 +13,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.common.util.JsonUtils
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -19,6 +22,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import org.json.JSONObject
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
@@ -39,6 +43,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         const val UPR_BOUND_E = -66.03826031
     }
 
+    // TODO: Implement info window on marker click
     override fun onMarkerClick(p0: Marker?) = false
 
     private lateinit var mMap: GoogleMap
@@ -55,25 +60,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private var viewAdapter: RecyclerView.Adapter<*>? = null
     private lateinit var viewManager: RecyclerView.LayoutManager
 
-    // TODO: Remove once SQLite is functional
-    val poiList = arrayOf(PointOfInterest("Ciencias Naturales II", "CN", LatLng(18.403971, -66.046375)),
-            PointOfInterest("Biblioteca Jose M. Lazaro", "1", LatLng(18.404268, -66.049842)),
-            PointOfInterest("Archivo Central UPRRP", "2", LatLng(18.404100, -66.046861)),
-            PointOfInterest(null,null,null),
-            PointOfInterest(null,null,null),
-            PointOfInterest(null,null,null),
-            PointOfInterest(null,null,null),
-            PointOfInterest(null,null,null),
-            PointOfInterest(null,null,null),
-            PointOfInterest(null,null,null),
-            PointOfInterest(null,null,null),
-            PointOfInterest(null,null,null),
-            PointOfInterest(null,null,null))
+    private lateinit var data: Array<PointOfInterest>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
+
+        // Get PointOfInterest objects from JSON data file
+        data = Response(resources.openRawResource(R.raw.poi).bufferedReader().use { it.readText() }).data
+        Log.d(TAG, "POIs read from json: ${data.size}")
 
         /*****************MAP LOGIC BEGINS**********************/
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -117,7 +113,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
          * initialized in order to bind list items to their position on the map.
          */
         viewManager = LinearLayoutManager(this)
-        viewAdapter = ListAdapter(poiList, mMap, mListViewBehavior)
+        viewAdapter = ListAdapter(data, mMap, mListViewBehavior)
         recyclerView = findViewById<RecyclerView>(R.id.recycler_view_list).apply {
             // Recycler view options
             setHasFixedSize(true)
@@ -147,9 +143,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         mMap.setMaxZoomPreference(MAX_ZOOM)
         // Add markers to map
         // TODO: Implement using SQLite
-        poiList.forEach {
-            if (it.mLatLng != null) {
-                mMap.addMarker(MarkerOptions().position(it.mLatLng).title(it.mName))
+        data.forEach {
+            if (it.latLng != null) {
+                mMap.addMarker(MarkerOptions().position(it.latLng).title(it.name))
             }
         }
     }
