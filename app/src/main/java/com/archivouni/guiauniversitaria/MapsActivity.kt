@@ -1,19 +1,19 @@
 package com.archivouni.guiauniversitaria
 
 import android.content.pm.PackageManager
-import android.content.res.Resources
 import android.location.Location
 import android.os.Bundle
-import android.util.JsonReader
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.SearchView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.gms.common.util.JsonUtils
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -22,29 +22,27 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import org.json.JSONObject
+import com.squareup.picasso.Picasso
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     companion object {
         private const val TAG = "MapsActivity"
 
-        private const val IMAGE_SERVER_URL = "http://ec2-18-220-11-214.us-east-2.compute.amazonaws.com/"
+        const val IMAGE_SERVER_URL = "http://ec2-18-220-11-214.us-east-2.compute.amazonaws.com/"
 
         private const val PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1
 
-        private const val DEFAULT_ZOOM = 16.15f
+        const val DEFAULT_ZOOM = 16.15f
         const val MIN_ZOOM = 16.15f
         const val MAX_ZOOM = 19f
+        const val ON_CLICK_ZOOM = 17.5f
 
         const val UPR_BOUND_S = 18.39926710
         const val UPR_BOUND_W = -66.05599693
         const val UPR_BOUND_N = 18.41188018
         const val UPR_BOUND_E = -66.03826031
     }
-
-    // TODO: Implement info window on marker click
-    override fun onMarkerClick(p0: Marker?) = false
 
     private lateinit var mMap: GoogleMap
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
@@ -56,11 +54,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private lateinit var mListView: View
     private lateinit var mListViewBehavior: BottomSheetBehavior<*>
 
-    private lateinit var recyclerView: RecyclerView
-    private var viewAdapter: RecyclerView.Adapter<*>? = null
-    private lateinit var viewManager: RecyclerView.LayoutManager
+    private lateinit var mInfoView: ViewGroup
+    private lateinit var mInfoViewBehavior: BottomSheetBehavior<*>
 
-    private lateinit var data: Array<PointOfInterest>
+    private lateinit var mRecyclerView: RecyclerView
+    private lateinit var mViewAdapter: RecyclerView.Adapter<*>
+    private lateinit var mViewManager: RecyclerView.LayoutManager
+
+    private lateinit var mData: Array<Marker?>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,31 +69,43 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         setSupportActionBar(findViewById(R.id.toolbar))
 
         // Get PointOfInterest objects from JSON data file
-        data = Response(resources.openRawResource(R.raw.poi).bufferedReader().use { it.readText() }).data
-        Log.d(TAG, "POIs read from json: ${data.size}")
+//        mData = Response(resources.openRawResource(R.raw.poi).bufferedReader().use { it.readText() }).data
+//        Log.d(TAG, "POIs read from json: ${mData.size}")
 
-        /*****************MAP LOGIC BEGINS**********************/
+        //region Map Logic
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+        //endregion
 
         /*****************BOTTOM_SHEET BEGINS**********************/
+        //region POI List View
         mListView = findViewById(R.id.list_view)
         mListViewBehavior = BottomSheetBehavior.from(mListView)
         mListViewBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        //endregion
+
+        mInfoView = findViewById(R.id.info_view)
+        mInfoViewBehavior = BottomSheetBehavior.from(mInfoView)
+        mInfoViewBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
         /*****************SEARCH_BUTTON BEGINS**********************/
+        //region Search Button
         val searchButton = findViewById<View>(R.id.search_button)
         searchButton.setOnClickListener {
             // Open list view on click
             mListViewBehavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
+        //endregion
 
         /*****************SEARCH_BAR BEGINS**********************/
+        //region Search Logic
         val searchBar = findViewById<SearchView>(R.id.search_bar)
         // TODO: Implement search logic here
+        //endregion
+
     }
 
     /**
@@ -107,18 +120,27 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
+        mData = Response(resources.openRawResource(R.raw.poi).bufferedReader().use { it.readText() }).data.map {poi ->
+            if (poi.latLng != null) {
+                mMap.addMarker(MarkerOptions().position(poi.latLng)).apply { tag = poi }
+            } else {
+                null
+            }
+        }.toTypedArray()
+        Log.d(TAG, "POIs read from json: ${mData.size}")
+
         /*****************RECYCLER_VIEW BEGINS**********************/
         /**
          * Recycler view is initialized here because ListAdapter requires that the map be
          * initialized in order to bind list items to their position on the map.
          */
-        viewManager = LinearLayoutManager(this)
-        viewAdapter = ListAdapter(data, mMap, mListViewBehavior)
-        recyclerView = findViewById<RecyclerView>(R.id.recycler_view_list).apply {
+        mViewManager = LinearLayoutManager(this)
+        mViewAdapter = ListAdapter(mData, mMap, mListViewBehavior, mInfoViewBehavior)
+        mRecyclerView = findViewById<RecyclerView>(R.id.recycler_view_list).apply {
             // Recycler view options
             setHasFixedSize(true)
-            layoutManager = viewManager
-            adapter = viewAdapter
+            layoutManager = mViewManager
+            adapter = mViewAdapter
         }
 
         /*****************MY_LOCATION LOGIC BEGINS**********************/
@@ -128,10 +150,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 //        getDeviceLocation()
 
         /*****************MAP_OPTIONS BEGINS**********************/
+        //region All options for map go here
         // Start with empty map
-        mMap.mapType = GoogleMap.MAP_TYPE_NONE
+//        mMap.mapType = GoogleMap.MAP_TYPE_NONE
         // Add tile overlay
-        mMap.addTileOverlay(TileOverlayOptions().tileProvider(GoogleMapsTileProvider(resources.assets)))
+//        mMap.addTileOverlay(TileOverlayOptions().tileProvider(GoogleMapsTileProvider(resources.assets)))
         // Set bounds for camera
         val uprBounds = LatLngBounds(LatLng(UPR_BOUND_S, UPR_BOUND_W), LatLng(UPR_BOUND_N, UPR_BOUND_E))
         mMap.setLatLngBoundsForCameraTarget(uprBounds)
@@ -141,11 +164,52 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         // Limit zoom
         mMap.setMinZoomPreference(MIN_ZOOM)
         mMap.setMaxZoomPreference(MAX_ZOOM)
-        // Add markers to map
-        data.forEach {
-            if (it.latLng != null) {
-                mMap.addMarker(MarkerOptions().position(it.latLng).title(it.name))
+
+        mMap.setOnMarkerClickListener(CustomOnMarkerClickListener())
+        //endregion
+    }
+
+    inner class CustomOnMarkerClickListener: GoogleMap.OnMarkerClickListener {
+        override fun onMarkerClick(marker: Marker?): Boolean {
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(marker!!.position, ON_CLICK_ZOOM))
+
+            val poi = marker.tag as PointOfInterest
+            if (poi.name != null) {
+                mInfoView.findViewById<TextView>(R.id.info_title).visibility = View.VISIBLE
+                mInfoView.findViewById<TextView>(R.id.info_title).text = poi.name
+            } else {
+                mInfoView.findViewById<TextView>(R.id.info_title).visibility = View.GONE
             }
+
+            if (poi.acronym != null) {
+                mInfoView.findViewById<TextView>(R.id.info_acronym).visibility = View.VISIBLE
+                mInfoView.findViewById<TextView>(R.id.info_acronym).text = poi.acronym
+            } else {
+                mInfoView.findViewById<TextView>(R.id.info_acronym).visibility = View.GONE
+            }
+
+            if (poi.description != null) {
+                mInfoView.findViewById<TextView>(R.id.info_description).visibility = View.VISIBLE
+                mInfoView.findViewById<TextView>(R.id.info_description).text = poi.description
+            } else {
+                mInfoView.findViewById<TextView>(R.id.info_description).visibility = View.GONE
+            }
+
+            val imageView = mInfoView.findViewById<ImageView>(R.id.info_image)
+            if (poi.images.isNotEmpty()) {
+//                poi.images.forEach {path ->
+//                    Picasso.get().load(IMAGE_SERVER_URL + path)
+//                            .fit()
+//                            .into(imageView)
+//                }
+                Picasso.get().load(IMAGE_SERVER_URL + poi.images[0])
+//                        .fit()
+                        .resize(400, 400)
+                        .into(imageView)
+            }
+
+            mInfoViewBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            return true
         }
     }
 

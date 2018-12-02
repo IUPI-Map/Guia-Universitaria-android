@@ -13,13 +13,13 @@ import android.widget.ImageView
 import java.net.URL
 
 object Tools {
-    fun loadImageFromURL(url: URL): Bitmap {
-        return LoadImage().execute(url).get()
-    }
+//    fun loadImageFromURL(url: String): Bitmap {
+//        return LoadImage().execute(URL(url)).get()
+//    }
 
-    private class LoadImage: AsyncTask<URL, Void, Bitmap>() {
-        override fun doInBackground(vararg url: URL?): Bitmap {
-            return loadImageFromURL(url[0]!!)
+    class LoadImage: AsyncTask<String, Void, Bitmap>() {
+        override fun doInBackground(vararg urls: String?): Bitmap {
+            return BitmapFactory.decodeStream(URL(urls[0]!!).openConnection().getInputStream())
         }
     }
 }

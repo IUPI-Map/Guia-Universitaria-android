@@ -2,6 +2,7 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:theme="@style/AppTheme"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -10,5 +11,7 @@
     <include layout="@layout/activity_maps" />
 
     <include layout="@layout/list_view" />
+
+    <include layout="@layout/info_view" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
