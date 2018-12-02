@@ -17,6 +17,7 @@ import java.lang.RuntimeException
 //This Class is in charged of displaying the list_item_poi
 class ListAdapter(private val mData: Array<Marker?>,
                   private val mMap: GoogleMap,
+                  private val mInfoView: View,
                   private val mListViewBehavior: BottomSheetBehavior<*>,
                   private val mInfoViewBehavior: BottomSheetBehavior<*>)
     : RecyclerView.Adapter<ListAdapter.POIViewHolder>() {
@@ -52,16 +53,27 @@ class ListAdapter(private val mData: Array<Marker?>,
             throw RuntimeException()
         }
         val poi = mData[pos]!!.tag as PointOfInterest
-        viewHolder.nameView?.text = poi.name ?: ""
-        viewHolder.acronymView?.text = poi.acronym ?: ""
+        if (poi.name != null) {
+            viewHolder.nameView!!.visibility = View.VISIBLE
+            viewHolder.nameView!!.text = poi.name
+        } else {
+            viewHolder.nameView!!.visibility = View.GONE
+        }
+        if (poi.acronym != null) {
+            viewHolder.acronymView!!.visibility = View.VISIBLE
+            viewHolder.acronymView!!.text = poi.acronym
+        } else {
+            viewHolder.acronymView!!.visibility = View.GONE
+        }
         if (poi.latLng != null) {
             viewHolder.itemView.setOnClickListener {
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(poi.latLng, ON_CLICK_ZOOM))
                 mListViewBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-                mInfoViewBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                Tools.bindInfoToView(poi, mInfoView)
+                mInfoViewBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             }
         }
         Log.d(TAG, "Binding ${poi.name} to pos: $pos\n" +
-                "Result: ${viewHolder.nameView?.text}")
+                "Result: ${viewHolder.nameView!!.text}")
     }
 }

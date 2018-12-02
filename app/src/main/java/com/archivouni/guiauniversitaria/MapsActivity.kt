@@ -54,7 +54,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mListView: View
     private lateinit var mListViewBehavior: BottomSheetBehavior<*>
 
-    private lateinit var mInfoView: ViewGroup
+    private lateinit var mInfoView: View
     private lateinit var mInfoViewBehavior: BottomSheetBehavior<*>
 
     private lateinit var mRecyclerView: RecyclerView
@@ -135,7 +135,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
          * initialized in order to bind list items to their position on the map.
          */
         mViewManager = LinearLayoutManager(this)
-        mViewAdapter = ListAdapter(mData, mMap, mListViewBehavior, mInfoViewBehavior)
+        mViewAdapter = ListAdapter(mData, mMap, mInfoView, mListViewBehavior, mInfoViewBehavior)
         mRecyclerView = findViewById<RecyclerView>(R.id.recycler_view_list).apply {
             // Recycler view options
             setHasFixedSize(true)
@@ -165,52 +165,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap.setMinZoomPreference(MIN_ZOOM)
         mMap.setMaxZoomPreference(MAX_ZOOM)
 
-        mMap.setOnMarkerClickListener(CustomOnMarkerClickListener())
-        //endregion
-    }
-
-    inner class CustomOnMarkerClickListener: GoogleMap.OnMarkerClickListener {
-        override fun onMarkerClick(marker: Marker?): Boolean {
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(marker!!.position, ON_CLICK_ZOOM))
+        mMap.setOnMarkerClickListener { marker ->
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(marker.position, ON_CLICK_ZOOM))
 
             val poi = marker.tag as PointOfInterest
-            if (poi.name != null) {
-                mInfoView.findViewById<TextView>(R.id.info_title).visibility = View.VISIBLE
-                mInfoView.findViewById<TextView>(R.id.info_title).text = poi.name
-            } else {
-                mInfoView.findViewById<TextView>(R.id.info_title).visibility = View.GONE
-            }
-
-            if (poi.acronym != null) {
-                mInfoView.findViewById<TextView>(R.id.info_acronym).visibility = View.VISIBLE
-                mInfoView.findViewById<TextView>(R.id.info_acronym).text = poi.acronym
-            } else {
-                mInfoView.findViewById<TextView>(R.id.info_acronym).visibility = View.GONE
-            }
-
-            if (poi.description != null) {
-                mInfoView.findViewById<TextView>(R.id.info_description).visibility = View.VISIBLE
-                mInfoView.findViewById<TextView>(R.id.info_description).text = poi.description
-            } else {
-                mInfoView.findViewById<TextView>(R.id.info_description).visibility = View.GONE
-            }
-
-            val imageView = mInfoView.findViewById<ImageView>(R.id.info_image)
-            if (poi.images.isNotEmpty()) {
-//                poi.images.forEach {path ->
-//                    Picasso.get().load(IMAGE_SERVER_URL + path)
-//                            .fit()
-//                            .into(imageView)
-//                }
-                Picasso.get().load(IMAGE_SERVER_URL + poi.images[0])
-//                        .fit()
-                        .resize(400, 400)
-                        .into(imageView)
-            }
+            Tools.bindInfoToView(poi, mInfoView)
 
             mInfoViewBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-            return true
+            true
         }
+        //endregion
     }
 
     /**

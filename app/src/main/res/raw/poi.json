@@ -464,7 +464,7 @@
         ], 
         "_id": 37, 
         "TYPE": "building", 
-        "NAME": "Eugenio Mar\u00eda de Hostos (Educaci\u00f3n)\n"
+        "NAME": "Eugenio Mar\u00eda de Hostos (Educaci\u00f3n)"
     }, 
     {
         "DESCRIPTION": "Persona: El Dr. Facundo Bueso Sanllehi nace en ciudad de M\u00e9xico el 5 de febrero de 1905, Facundo se integra a la escuela modelo la UPR donde todas las asignaturas eran en ingl\u00e9s excepto el espa\u00f1ol. En 1923 se grad\u00faa de la escuela superior de UPR y en 1927 se grad\u00faa con un bachillerato en ciencias el cual le permiti\u00f3, por cosas de la vida, cubrir la plaza de profesor de f\u00edsica a\u00fan antes de graduarse. Para el 1943 es nombrado Decano del Colegio de Ciencias Naturales. Profesor de F\u00edsica con un doctorado de la Universidad de Chicago, atleta reconocido por el Sal\u00f3n de la Fama, Decano de la facultad de Ciencias Naturales, presidente de la secci\u00f3n de ciencias del Ateneo Puertorrique\u00f1o, se distingui\u00f3 tambi\u00e9n por ser un gran divulgador de la ciencia, escribiendo art\u00edculos para el p\u00fablico y manteniendo por muchos a\u00f1os un programa radial por WIPR.\n\nEdificio: Su arquitecto Henry Klumb (1948).  Alejado del estilo del Renacimiento Espa\u00f1ol de los edificios construidos durante la primera mitad del siglo XX, su dise\u00f1o representa el estilo del Movimiento Moderno que centrar\u00e1 la pauta hacia el futuro. La estructura comprende cuatro alas, dos de las cuales forman la fachada en eje con las l\u00edneas ortogonales del Cuadr\u00e1ngulo. Su programa inclu\u00eda laboratorios de f\u00edsica, de qu\u00edmica org\u00e1nica e inorg\u00e1nica, de an\u00e1lisis cualitativo y cuantitativo, estaci\u00f3n meteorol\u00f3gica y laboratorios de radiocomunicaciones. ", 
@@ -707,7 +707,7 @@
         ], 
         "_id": 56, 
         "TYPE": "building", 
-        "NAME": "Residencia Campu"
+        "NAME": "Residencia Campus"
     }, 
     {
         "DESCRIPTION": null, 
