@@ -8,15 +8,22 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import java.lang.RuntimeException
 
 //This Class is in charged of displaying the list_item_poi
-class ListAdapter(private val mData: Array<PointOfInterest>, private val mMap: GoogleMap, private val mBottomSheetBehavior: BottomSheetBehavior<*>): RecyclerView.Adapter<ListAdapter.POIViewHolder>() {
+class ListAdapter(private val mData: Array<Marker?>,
+                  private val mMap: GoogleMap,
+                  private val mInfoView: View,
+                  private val mListViewBehavior: BottomSheetBehavior<*>,
+                  private val mInfoViewBehavior: BottomSheetBehavior<*>)
+    : RecyclerView.Adapter<ListAdapter.POIViewHolder>() {
 
     companion object {
         private const val TAG = "ListAdapter"
-
-        private const val ON_CLICK_ZOOM = 17.5f
     }
 
     class POIViewHolder(poiView: View): RecyclerView.ViewHolder(poiView) {
@@ -41,16 +48,30 @@ class ListAdapter(private val mData: Array<PointOfInterest>, private val mMap: G
 
     // Binds data to view when it becomes available
     override fun onBindViewHolder(viewHolder: POIViewHolder, pos: Int) {
-        viewHolder.nameView?.text = mData[pos].name
-        viewHolder.acronymView?.text = if (mData[pos].acronym != null) mData[pos].acronym else ""
-        if (mData[pos].latLng != null) {
+        if (mData[pos] == null) {
+            Log.e(TAG, "Marker $pos is null")
+            throw RuntimeException()
+        }
+        val poi = mData[pos]!!.tag as PointOfInterest
+        Util.bindInfoToView(poi.name, viewHolder.nameView!!)
+        Util.bindInfoToView(poi.acronym, viewHolder.acronymView!!)
+        if (poi.latLng != null) {
             viewHolder.itemView.setOnClickListener {
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mData[pos].latLng, ON_CLICK_ZOOM))
-                mBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-                // TODO: Open information view for point of interest
+                if (Util.focusedMarker != null) {
+                    Util.focusedMarker!!.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+                }
+                mData[pos]!!.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+                Util.bindInfoToView(poi, mInfoView, mMap)
+                Util.setPaddingAfterLayout(mInfoView, mMap, poi.latLng)
+                Util.focusedMarker = mData[pos]
+                mListViewBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                mInfoViewBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             }
         }
-        Log.d(TAG, "Binding ${mData[pos].name} to pos: $pos\n" +
-                "Result: ${viewHolder.nameView?.text}")
+        Log.d(TAG, "Binding ${poi.name} to pos: $pos\n" +
+                "Result: ${viewHolder.nameView!!.text}")
     }
+
+    private fun calculatePadding(latLng: LatLng, yOffset: Int): LatLng =
+        LatLng(latLng.latitude - yOffset, latLng.longitude)
 }

@@ -1,10 +1,8 @@
 package com.archivouni.guiauniversitaria
 
 import android.content.pm.PackageManager
-import android.content.res.Resources
 import android.location.Location
 import android.os.Bundle
-import android.util.JsonReader
 import android.util.Log
 import android.view.View
 import android.widget.SearchView
@@ -13,7 +11,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.gms.common.util.JsonUtils
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -22,29 +19,14 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import org.json.JSONObject
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     companion object {
         private const val TAG = "MapsActivity"
 
-        private const val IMAGE_SERVER_URL = "http://ec2-18-220-11-214.us-east-2.compute.amazonaws.com/"
-
         private const val PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1
-
-        private const val DEFAULT_ZOOM = 16.15f
-        const val MIN_ZOOM = 16.15f
-        const val MAX_ZOOM = 19f
-
-        const val UPR_BOUND_S = 18.39926710
-        const val UPR_BOUND_W = -66.05599693
-        const val UPR_BOUND_N = 18.41188018
-        const val UPR_BOUND_E = -66.03826031
     }
-
-    // TODO: Implement info window on marker click
-    override fun onMarkerClick(p0: Marker?) = false
 
     private lateinit var mMap: GoogleMap
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
@@ -56,44 +38,78 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private lateinit var mListView: View
     private lateinit var mListViewBehavior: BottomSheetBehavior<*>
 
-    private lateinit var recyclerView: RecyclerView
-    private var viewAdapter: RecyclerView.Adapter<*>? = null
-    private lateinit var viewManager: RecyclerView.LayoutManager
+    private lateinit var mInfoView: View
+    private lateinit var mInfoViewBehavior: BottomSheetBehavior<*>
 
-    private lateinit var data: Array<PointOfInterest>
+    private lateinit var mRecyclerView: RecyclerView
+    private lateinit var mViewAdapter: RecyclerView.Adapter<*>
+    private lateinit var mViewManager: RecyclerView.LayoutManager
+
+    private lateinit var mData: Array<Marker?>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
 
-        // Get PointOfInterest objects from JSON data file
-        data = Response(resources.openRawResource(R.raw.poi).bufferedReader().use { it.readText() }).data
-        Log.d(TAG, "POIs read from json: ${data.size}")
-
-        /*****************MAP LOGIC BEGINS**********************/
+        //region Map Logic
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+        //endregion
 
         /*****************BOTTOM_SHEET BEGINS**********************/
+        //region POI List View
         mListView = findViewById(R.id.list_view)
-        mListViewBehavior = BottomSheetBehavior.from(mListView)
-        mListViewBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        mListViewBehavior = BottomSheetBehavior.from(mListView).apply {
+            state = BottomSheetBehavior.STATE_HIDDEN
+            peekHeight = Util.LIST_VIEW_PEEK_HEIGHT
+        }
+        //endregion
+
+        mInfoView = findViewById(R.id.info_view)
+        mInfoViewBehavior = BottomSheetBehavior.from(mInfoView).apply {
+            state = BottomSheetBehavior.STATE_HIDDEN
+            peekHeight = Util.INFO_VIEW_PEEK_HEIGHT
+            setBottomSheetCallback(object: BottomSheetBehavior.BottomSheetCallback() {
+                override fun onSlide(view: View, slideOffset: Float) {
+                }
+
+                override fun onStateChanged(view: View, newState: Int) {
+
+                    when (newState) {
+                        BottomSheetBehavior.STATE_HIDDEN -> {
+                            mMap.setPadding(0,0,0,0)
+                            if (Util.focusedMarker != null) {
+                                Util.focusedMarker!!.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+                            }
+                        }
+                        else -> 0
+                    }
+                }
+
+            })
+        }
 
         /*****************SEARCH_BUTTON BEGINS**********************/
+        //region Search Button
         val searchButton = findViewById<View>(R.id.search_button)
         searchButton.setOnClickListener {
             // Open list view on click
             mListViewBehavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
+        //endregion
 
         /*****************SEARCH_BAR BEGINS**********************/
+        //region Search Logic
         val searchBar = findViewById<SearchView>(R.id.search_bar)
         // TODO: Implement search logic here
+        //endregion
+
     }
+
 
     /**
      * Manipulates the map once available.
@@ -107,18 +123,27 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
+        mData = Response(resources.openRawResource(R.raw.poi).bufferedReader().use { it.readText() }).data.map {poi ->
+            if (poi.latLng != null) {
+                mMap.addMarker(MarkerOptions().position(poi.latLng)).apply { tag = poi }
+            } else {
+                null
+            }
+        }.toTypedArray()
+        Log.d(TAG, "POIs read from json: ${mData.size}")
+
         /*****************RECYCLER_VIEW BEGINS**********************/
         /**
          * Recycler view is initialized here because ListAdapter requires that the map be
          * initialized in order to bind list items to their position on the map.
          */
-        viewManager = LinearLayoutManager(this)
-        viewAdapter = ListAdapter(data, mMap, mListViewBehavior)
-        recyclerView = findViewById<RecyclerView>(R.id.recycler_view_list).apply {
+        mViewManager = LinearLayoutManager(this)
+        mViewAdapter = ListAdapter(mData, mMap, mInfoView, mListViewBehavior, mInfoViewBehavior)
+        mRecyclerView = findViewById<RecyclerView>(R.id.recycler_view_list).apply {
             // Recycler view options
             setHasFixedSize(true)
-            layoutManager = viewManager
-            adapter = viewAdapter
+            layoutManager = mViewManager
+            adapter = mViewAdapter
         }
 
         /*****************MY_LOCATION LOGIC BEGINS**********************/
@@ -128,25 +153,40 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 //        getDeviceLocation()
 
         /*****************MAP_OPTIONS BEGINS**********************/
+        mMap.uiSettings.isMapToolbarEnabled = false
+        //region All options for map go here
         // Start with empty map
-        mMap.mapType = GoogleMap.MAP_TYPE_NONE
+//        mMap.mapType = GoogleMap.MAP_TYPE_NONE
         // Add tile overlay
-        mMap.addTileOverlay(TileOverlayOptions().tileProvider(GoogleMapsTileProvider(resources.assets)))
+//        mMap.addTileOverlay(TileOverlayOptions().tileProvider(GoogleMapsTileProvider(resources.assets)))
         // Set bounds for camera
-        val uprBounds = LatLngBounds(LatLng(UPR_BOUND_S, UPR_BOUND_W), LatLng(UPR_BOUND_N, UPR_BOUND_E))
+        val uprBounds = LatLngBounds(LatLng(Util.UPR_BOUND_S, Util.UPR_BOUND_W), LatLng(Util.UPR_BOUND_N, Util.UPR_BOUND_E))
         mMap.setLatLngBoundsForCameraTarget(uprBounds)
         // Open camera at LatLng specified by upr
         val upr = LatLng(18.404123, -66.048714)
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(upr, DEFAULT_ZOOM))
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(upr, Util.DEFAULT_ZOOM))
         // Limit zoom
-        mMap.setMinZoomPreference(MIN_ZOOM)
-        mMap.setMaxZoomPreference(MAX_ZOOM)
-        // Add markers to map
-        data.forEach {
-            if (it.latLng != null) {
-                mMap.addMarker(MarkerOptions().position(it.latLng).title(it.name))
+        mMap.setMinZoomPreference(Util.MIN_ZOOM)
+        mMap.setMaxZoomPreference(Util.MAX_ZOOM)
+
+        mMap.setOnMarkerClickListener { marker ->
+            Log.d(TAG, "Focused marker: ${if (Util.focusedMarker != null) (Util.focusedMarker!!.tag as PointOfInterest).name else "none"}")
+            if (Util.focusedMarker != null) {
+                Util.focusedMarker!!.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
             }
+            marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+
+            Util.bindInfoToView(marker.tag as PointOfInterest, mInfoView, mMap)
+
+            Util.setPaddingAfterLayout(mInfoView, mMap, marker.position)
+
+            mListViewBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+            mInfoViewBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+
+            Util.focusedMarker = marker
+            true
         }
+        //endregion
     }
 
     /**
@@ -172,6 +212,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         when (requestCode) {
             PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION -> {
                 // If request is cancelled, the result arrays are empty.
+
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     mLocationPermissionGranted = true
                 }

@@ -11,8 +11,11 @@ import org.json.JSONObject
  *      data: array of PointOfInterest objects
  */
 class Response(json: String): JSONArray(json) {
-    val data = this.let { 0.until(it.length()).map { i -> it.getJSONObject(i) } }
-            .map { PointOfInterest(it.toString()) }.toTypedArray()
+    val data = this
+            .let { poiArray ->
+                0.until(poiArray.length()).map { index -> poiArray.getJSONObject(index) } }
+            .map { PointOfInterest(it.toString()) }
+            .toTypedArray()
 }
 
 /**
@@ -46,20 +49,24 @@ class PointOfInterest(json: String): JSONObject(json) {
         }
     }
 
-    val id: Int = this.getInt(TAG_ID)
-    val type = when(this.getString(TAG_TYPE)) {
+    val id: Int = getInt(TAG_ID)
+    val type = when(getString(TAG_TYPE)) {
         "building" -> TYPE.BUILDING
         "artwork" -> TYPE.ARTWORK
         else -> TYPE.DEFAULT
     }
-    val name: String? = if(this.getString(TAG_NAME) != "null") this.getString(TAG_NAME) else null
-    val description: String? = if(this.getString(TAG_DESCRIPTION) != "null") this.getString(TAG_DESCRIPTION) else null
-    val acronym: String? = if(this.getString(TAG_ACRONYM) != "null") this.getString(TAG_ACRONYM) else null
-    val latLng: LatLng? = LatLng(this.getDouble(TAG_LATITUDE), this.getDouble(TAG_LONGITUDE))
+    val name: String? = if(getString(TAG_NAME) != "null") getString(TAG_NAME) else null
+    val description: String? = if(getString(TAG_DESCRIPTION) != "null") getString(TAG_DESCRIPTION) else null
+    val acronym: String? = if(getString(TAG_ACRONYM) != "null") getString(TAG_ACRONYM) else null
+    val latLng: LatLng? = LatLng(getDouble(TAG_LATITUDE), getDouble(TAG_LONGITUDE))
     // Convert JSONArray to array of strings
-    val images = this.getJSONArray(TAG_IMAGES).let {
-        Array(it.length()) { i ->
-            it[i].toString()
+    val images = getJSONArray(TAG_IMAGES).let { imgArray ->
+        if (imgArray.length() > 0) {
+            Array(imgArray.length()) { i ->
+                imgArray[i].toString()
+            }
+        } else {
+            null
         }
     }
 }
