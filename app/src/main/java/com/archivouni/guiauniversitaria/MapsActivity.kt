@@ -45,7 +45,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mViewAdapter: RecyclerView.Adapter<*>
     private lateinit var mViewManager: RecyclerView.LayoutManager
 
-    private var focusedMarker: Marker? = null
     private lateinit var mData: Array<Marker?>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -83,8 +82,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     when (newState) {
                         BottomSheetBehavior.STATE_HIDDEN -> {
                             mMap.setPadding(0,0,0,0)
-                            if (focusedMarker != null) {
-                                focusedMarker!!.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+                            if (Util.focusedMarker != null) {
+                                Util.focusedMarker!!.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
                             }
                         }
                         else -> 0
@@ -171,25 +170,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap.setMaxZoomPreference(Util.MAX_ZOOM)
 
         mMap.setOnMarkerClickListener { marker ->
-            Log.d(TAG, "Focused marker: ${if (focusedMarker != null) (focusedMarker!!.tag as PointOfInterest).name else "none"}")
-            if (focusedMarker != null) {
-                focusedMarker!!.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+            Log.d(TAG, "Focused marker: ${if (Util.focusedMarker != null) (Util.focusedMarker!!.tag as PointOfInterest).name else "none"}")
+            if (Util.focusedMarker != null) {
+                Util.focusedMarker!!.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
             }
-
             marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
 
+            Util.bindInfoToView(marker.tag as PointOfInterest, mInfoView, mMap)
 
-
-            val poi = marker.tag as PointOfInterest
-            Util.bindInfoToView(poi, mInfoView, mMap)
-
-            Util.setPaddingAfterLayout(mInfoView, mMap, marker.position, focusedMarker)
+            Util.setPaddingAfterLayout(mInfoView, mMap, marker.position)
 
             mListViewBehavior.state = BottomSheetBehavior.STATE_HIDDEN
             mInfoViewBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
 
-            focusedMarker = marker
-            false
+            Util.focusedMarker = marker
+            true
         }
         //endregion
     }

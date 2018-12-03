@@ -36,9 +36,10 @@ object Util {
     //endregion
 
     var infoViewHeight = 0
+    var focusedMarker: Marker? = null
 
-    fun setPaddingAfterLayout(view: View, map: GoogleMap, pos: LatLng? = null, focusedMarker: Marker? = null) {
-        if (focusedMarker != null && focusedMarker.position == pos) {
+    fun setPaddingAfterLayout(view: View, map: GoogleMap, pos: LatLng? = null) {
+        if (focusedMarker != null && focusedMarker!!.position == pos) {
             map.setPadding(0,0,0, infoViewHeight)
             return
         }

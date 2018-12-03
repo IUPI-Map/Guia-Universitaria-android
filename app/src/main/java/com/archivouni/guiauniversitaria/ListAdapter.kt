@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -56,8 +57,13 @@ class ListAdapter(private val mData: Array<Marker?>,
         Util.bindInfoToView(poi.acronym, viewHolder.acronymView!!)
         if (poi.latLng != null) {
             viewHolder.itemView.setOnClickListener {
+                if (Util.focusedMarker != null) {
+                    Util.focusedMarker!!.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+                }
+                mData[pos]!!.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                 Util.bindInfoToView(poi, mInfoView, mMap)
                 Util.setPaddingAfterLayout(mInfoView, mMap, poi.latLng)
+                Util.focusedMarker = mData[pos]
                 mListViewBehavior.state = BottomSheetBehavior.STATE_HIDDEN
                 mInfoViewBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             }
