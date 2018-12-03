@@ -13,17 +13,21 @@
     app:layout_behavior="@string/bottom_sheet_behavior">
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/info_title"
+        android:id="@+id/info_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="14sp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:textSize="20sp"
         android:text="Title"/>
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/info_acronym"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="10sp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:textSize="16sp"
         android:text="Acronym"/>
 
     <androidx.appcompat.widget.AppCompatImageView

@@ -6,12 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.archivouni.guiauniversitaria.MapsActivity.Companion.ON_CLICK_ZOOM
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import java.lang.Exception
 import java.lang.RuntimeException
 
 //This Class is in charged of displaying the list_item_poi
@@ -53,27 +52,20 @@ class ListAdapter(private val mData: Array<Marker?>,
             throw RuntimeException()
         }
         val poi = mData[pos]!!.tag as PointOfInterest
-        if (poi.name != null) {
-            viewHolder.nameView!!.visibility = View.VISIBLE
-            viewHolder.nameView!!.text = poi.name
-        } else {
-            viewHolder.nameView!!.visibility = View.GONE
-        }
-        if (poi.acronym != null) {
-            viewHolder.acronymView!!.visibility = View.VISIBLE
-            viewHolder.acronymView!!.text = poi.acronym
-        } else {
-            viewHolder.acronymView!!.visibility = View.GONE
-        }
+        Util.bindInfoToView(poi.name, viewHolder.nameView!!)
+        Util.bindInfoToView(poi.acronym, viewHolder.acronymView!!)
         if (poi.latLng != null) {
             viewHolder.itemView.setOnClickListener {
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(poi.latLng, ON_CLICK_ZOOM))
+                Util.bindInfoToView(poi, mInfoView, mMap)
+                Util.setPaddingAfterLayout(mInfoView, mMap, poi.latLng)
                 mListViewBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-                Tools.bindInfoToView(poi, mInfoView)
                 mInfoViewBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             }
         }
         Log.d(TAG, "Binding ${poi.name} to pos: $pos\n" +
                 "Result: ${viewHolder.nameView!!.text}")
     }
+
+    private fun calculatePadding(latLng: LatLng, yOffset: Int): LatLng =
+        LatLng(latLng.latitude - yOffset, latLng.longitude)
 }

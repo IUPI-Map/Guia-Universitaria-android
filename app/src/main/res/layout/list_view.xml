@@ -18,7 +18,7 @@
         android:layout_height="64dp"
         android:elevation="4dp">
 
-        <SearchView
+        <androidx.appcompat.widget.SearchView
             android:id="@+id/search_bar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -26,6 +26,11 @@
             android:layout_above="@id/map"
             android:background="@color/colorItem"
             android:queryHint="Search here"
+            android:clickable="true"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            app:iconifiedByDefault="false"
+
             />
 
     </androidx.appcompat.widget.Toolbar>

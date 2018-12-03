@@ -5,10 +5,7 @@ import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.SearchView
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -22,26 +19,13 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.squareup.picasso.Picasso
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     companion object {
         private const val TAG = "MapsActivity"
 
-        const val IMAGE_SERVER_URL = "http://ec2-18-220-11-214.us-east-2.compute.amazonaws.com/"
-
         private const val PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1
-
-        const val DEFAULT_ZOOM = 16.15f
-        const val MIN_ZOOM = 16.15f
-        const val MAX_ZOOM = 19f
-        const val ON_CLICK_ZOOM = 17.5f
-
-        const val UPR_BOUND_S = 18.39926710
-        const val UPR_BOUND_W = -66.05599693
-        const val UPR_BOUND_N = 18.41188018
-        const val UPR_BOUND_E = -66.03826031
     }
 
     private lateinit var mMap: GoogleMap
@@ -61,16 +45,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mViewAdapter: RecyclerView.Adapter<*>
     private lateinit var mViewManager: RecyclerView.LayoutManager
 
+    private var focusedMarker: Marker? = null
     private lateinit var mData: Array<Marker?>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
-
-        // Get PointOfInterest objects from JSON data file
-//        mData = Response(resources.openRawResource(R.raw.poi).bufferedReader().use { it.readText() }).data
-//        Log.d(TAG, "POIs read from json: ${mData.size}")
 
         //region Map Logic
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -83,13 +64,35 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         /*****************BOTTOM_SHEET BEGINS**********************/
         //region POI List View
         mListView = findViewById(R.id.list_view)
-        mListViewBehavior = BottomSheetBehavior.from(mListView)
-        mListViewBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        mListViewBehavior = BottomSheetBehavior.from(mListView).apply {
+            state = BottomSheetBehavior.STATE_HIDDEN
+            peekHeight = Util.LIST_VIEW_PEEK_HEIGHT
+        }
         //endregion
 
         mInfoView = findViewById(R.id.info_view)
-        mInfoViewBehavior = BottomSheetBehavior.from(mInfoView)
-        mInfoViewBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        mInfoViewBehavior = BottomSheetBehavior.from(mInfoView).apply {
+            state = BottomSheetBehavior.STATE_HIDDEN
+            peekHeight = Util.INFO_VIEW_PEEK_HEIGHT
+            setBottomSheetCallback(object: BottomSheetBehavior.BottomSheetCallback() {
+                override fun onSlide(view: View, slideOffset: Float) {
+                }
+
+                override fun onStateChanged(view: View, newState: Int) {
+
+                    when (newState) {
+                        BottomSheetBehavior.STATE_HIDDEN -> {
+                            mMap.setPadding(0,0,0,0)
+                            if (focusedMarker != null) {
+                                focusedMarker!!.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+                            }
+                        }
+                        else -> 0
+                    }
+                }
+
+            })
+        }
 
         /*****************SEARCH_BUTTON BEGINS**********************/
         //region Search Button
@@ -107,6 +110,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         //endregion
 
     }
+
 
     /**
      * Manipulates the map once available.
@@ -150,29 +154,42 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 //        getDeviceLocation()
 
         /*****************MAP_OPTIONS BEGINS**********************/
+        mMap.uiSettings.isMapToolbarEnabled = false
         //region All options for map go here
         // Start with empty map
 //        mMap.mapType = GoogleMap.MAP_TYPE_NONE
         // Add tile overlay
 //        mMap.addTileOverlay(TileOverlayOptions().tileProvider(GoogleMapsTileProvider(resources.assets)))
         // Set bounds for camera
-        val uprBounds = LatLngBounds(LatLng(UPR_BOUND_S, UPR_BOUND_W), LatLng(UPR_BOUND_N, UPR_BOUND_E))
+        val uprBounds = LatLngBounds(LatLng(Util.UPR_BOUND_S, Util.UPR_BOUND_W), LatLng(Util.UPR_BOUND_N, Util.UPR_BOUND_E))
         mMap.setLatLngBoundsForCameraTarget(uprBounds)
         // Open camera at LatLng specified by upr
         val upr = LatLng(18.404123, -66.048714)
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(upr, DEFAULT_ZOOM))
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(upr, Util.DEFAULT_ZOOM))
         // Limit zoom
-        mMap.setMinZoomPreference(MIN_ZOOM)
-        mMap.setMaxZoomPreference(MAX_ZOOM)
+        mMap.setMinZoomPreference(Util.MIN_ZOOM)
+        mMap.setMaxZoomPreference(Util.MAX_ZOOM)
 
         mMap.setOnMarkerClickListener { marker ->
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(marker.position, ON_CLICK_ZOOM))
+            Log.d(TAG, "Focused marker: ${if (focusedMarker != null) (focusedMarker!!.tag as PointOfInterest).name else "none"}")
+            if (focusedMarker != null) {
+                focusedMarker!!.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+            }
+
+            marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+
+
 
             val poi = marker.tag as PointOfInterest
-            Tools.bindInfoToView(poi, mInfoView)
+            Util.bindInfoToView(poi, mInfoView, mMap)
 
+            Util.setPaddingAfterLayout(mInfoView, mMap, marker.position, focusedMarker)
+
+            mListViewBehavior.state = BottomSheetBehavior.STATE_HIDDEN
             mInfoViewBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-            true
+
+            focusedMarker = marker
+            false
         }
         //endregion
     }
@@ -200,6 +217,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         when (requestCode) {
             PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION -> {
                 // If request is cancelled, the result arrays are empty.
+
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     mLocationPermissionGranted = true
                 }

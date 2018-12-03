@@ -61,8 +61,12 @@ class PointOfInterest(json: String): JSONObject(json) {
     val latLng: LatLng? = LatLng(getDouble(TAG_LATITUDE), getDouble(TAG_LONGITUDE))
     // Convert JSONArray to array of strings
     val images = getJSONArray(TAG_IMAGES).let { imgArray ->
-        Array(imgArray.length()) { i ->
-            imgArray[i].toString()
+        if (imgArray.length() > 0) {
+            Array(imgArray.length()) { i ->
+                imgArray[i].toString()
+            }
+        } else {
+            null
         }
     }
 }
