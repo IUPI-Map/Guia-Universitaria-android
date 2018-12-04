@@ -13,6 +13,7 @@ import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import java.lang.Exception
 
+// This object hold project-wide constants and methods
 object Util {
     private const val TAG = "Util"
 
@@ -23,6 +24,9 @@ object Util {
     const val MIN_ZOOM = 16.15f
     const val MAX_ZOOM = 19f
     const val FOCUS_ZOOM = 17.5f
+
+    const val DEFAULT_LATITUDE = 18.404123
+    const val DEFAULT_LONGITUDE = -66.048714
 
     const val UPR_BOUND_S = 18.39926710
     const val UPR_BOUND_W = -66.05599693
@@ -98,7 +102,7 @@ object Util {
         }
     }
 
-    class LoadImageCallback(val url: String, val view: View, val map: GoogleMap): Callback {
+    class LoadImageCallback(private val url: String, val view: View, val map: GoogleMap): Callback {
         companion object {
             private const val TAG = "LoadImageCallback"
         }
