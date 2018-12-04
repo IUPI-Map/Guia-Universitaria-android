@@ -12,6 +12,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import android.os.AsyncTask
+import com.archivouni.guiauniversitaria.R.id.map
 import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
@@ -19,8 +20,10 @@ import java.net.HttpURLConnection
 import java.net.URL
 import com.google.android.gms.maps.model.*
 import com.google.maps.android.PolyUtil
+import com.squareup.picasso.Request
 import org.json.JSONArray
 import org.json.JSONObject
+import java.net.UnknownHostException
 import kotlin.Exception
 
 
@@ -133,17 +136,22 @@ object Util {
 
     object DirectionsJSONParser {
         private const val TAG_ROUTES = "routes"
+        private const val TAG_LEGS = "legs"
+        private const val TAG_STEPS = "steps"
         private const val TAG_OVERVIEW_POLYLINE = "overview_polyline"
         private const val TAG_POINTS="points"
 
         fun parse(jObject: JSONObject): List<LatLng>? {
             val jRoutes: JSONArray?
+            var jLegs: JSONArray?
+            var jSteps: JSONArray?
 
             try {
                 jRoutes = jObject.getJSONArray(TAG_ROUTES)
                 if (jRoutes.length() > 0) {
-                    val overviewPolyline = (jRoutes[0] as JSONObject).getJSONObject(TAG_OVERVIEW_POLYLINE)
+                    val overviewPolyline = (jRoutes.get(0) as JSONObject).getJSONObject(TAG_OVERVIEW_POLYLINE)
                     val encodedPoints = overviewPolyline.getString(TAG_POINTS)
+                    Log.d(TAG, "Polyline: $encodedPoints")
                     return PolyUtil.decode(encodedPoints)
                 } else {
                     throw Exception("No routes")
@@ -164,13 +172,20 @@ object Util {
             val url = URL(strUrl)
 
             // Creating an http connection to communicate with url
-            urlConnection = url.openConnection() as HttpURLConnection
+            urlConnection = (url.openConnection() as HttpURLConnection)
+                    .apply {
+                        readTimeout = 15 * 1000
+                        connectTimeout = 15 * 1000
+                        requestMethod = "GET"
+                    }
 
             // Connecting to url
             urlConnection.connect()
+            Log.d(TAG, "Connected to host")
 
             // Reading data from url
             iStream = urlConnection.inputStream
+            Log.d(TAG, iStream.toString())
 
             val br = BufferedReader(InputStreamReader(iStream))
 
@@ -188,7 +203,7 @@ object Util {
             br.close()
 
         } catch (e: Exception) {
-            Log.d(TAG, e.toString())
+            Log.e(TAG, e.toString())
         } finally {
             iStream!!.close()
             urlConnection!!.disconnect()
@@ -197,7 +212,7 @@ object Util {
     }
 
     // Fetches data from url passed
-    class DownloadTask(val map: GoogleMap): AsyncTask<String, Void, String>() {
+    class DownloadTask(val map: GoogleMap): AsyncTask<String, Void, String?>() {
 
         // Downloading data in non-ui thread
         override fun doInBackground(vararg url: String): String {
@@ -209,8 +224,10 @@ object Util {
             try {
                 // Fetching the data from web service
                 data = downloadUrl(url[0])
+            } catch (e: UnknownHostException) {
+                Log.e(TAG, "Unable to connect to host: ${url[0]}")
             } catch (e: Exception) {
-                Log.d("Background Task", e.toString())
+                Log.d("Tag", e.toString())
             }
 
             Log.d(TAG, "Data: $data")
@@ -219,9 +236,12 @@ object Util {
 
         // Executes in UI thread, after the execution of
         // doInBackground()
-        override fun onPostExecute(result: String) {
-            super.onPostExecute(result)
+        override fun onPostExecute(result: String?) {
 
+            if (result == null) {
+                return
+            }
+            Log.d(TAG,"json length: ${result.length}")
             val parserTask = ParserTask(map)
 
             // Invokes the thread for parsing the JSON data
@@ -229,33 +249,40 @@ object Util {
         }
     }
 
-    class ParserTask(val map: GoogleMap): AsyncTask<String, Void, List<LatLng>>() {
+    class ParserTask(val map: GoogleMap): AsyncTask<String, Void, List<LatLng>?>() {
 
         // Parsing the data in non-ui thread
         override fun doInBackground(vararg jsonData: String): List<LatLng>? {
             Log.d(TAG, "Parsing data")
             val jObject: JSONObject
-            var route: List<LatLng>? = null
+            val route: List<LatLng>?
 
             try {
+                Log.d(TAG, "Test")
                 jObject = JSONObject(jsonData[0])
                 route = DirectionsJSONParser.parse(jObject)
                 Log.d(TAG, route.toString())
+                return route
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-            return route
+            return null
         }
 
         // Executes in UI thread, after the parsing process
-        override fun onPostExecute(result: List<LatLng>) {
+        override fun onPostExecute(result: List<LatLng>?) {
+            if (result == null) {
+                Log.e(TAG, "Data not found")
+                return
+            }
             val lineOptions = PolylineOptions().apply {
                 addAll(result)
-                width(4f)
+                width(8f)
+                zIndex(4f)
                 color(Color.RED)
+                visible(true)
             }
-
-            map.addPolyline(lineOptions)
+            var x = map.addPolyline(lineOptions)
             Log.d(TAG, "Finished parsing")
         }
     }
