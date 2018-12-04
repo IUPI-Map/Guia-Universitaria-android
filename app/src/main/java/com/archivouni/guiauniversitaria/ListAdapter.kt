@@ -19,7 +19,8 @@ class ListAdapter(private val mData: Array<Marker?>,
                   private val mMap: GoogleMap,
                   private val mInfoView: View,
                   private val mListViewBehavior: BottomSheetBehavior<*>,
-                  private val mInfoViewBehavior: BottomSheetBehavior<*>)
+                  private val mInfoViewBehavior: BottomSheetBehavior<*>,
+                  private val mKey: String)
     : RecyclerView.Adapter<ListAdapter.POIViewHolder>() {
 
     companion object {
@@ -61,7 +62,9 @@ class ListAdapter(private val mData: Array<Marker?>,
                     Util.focusedMarker!!.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
                 }
                 mData[pos]!!.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-                Util.bindInfoToView(poi, mInfoView, mMap)
+                Util.bindInfoToView(poi, mInfoView, mMap,
+                        LatLng(18.404388,-66.047509),
+                        mKey)
                 Util.setPaddingAfterLayout(mInfoView, mMap, poi.latLng)
                 Util.focusedMarker = mData[pos]
                 mListViewBehavior.state = BottomSheetBehavior.STATE_HIDDEN

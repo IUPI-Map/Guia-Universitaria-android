@@ -1,8 +1,11 @@
 package com.archivouni.guiauniversitaria
 
+import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
+import android.os.Looper
+import android.provider.SettingsSlicesContract.KEY_LOCATION
 import android.util.Log
 import android.view.View
 import android.widget.SearchView
@@ -11,14 +14,20 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.ResolvableApiException
+import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.google.android.gms.tasks.OnFailureListener
+import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import java.lang.Exception
+import java.text.DateFormat
+import java.util.*
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -26,6 +35,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         private const val TAG = "MapsActivity"
 
         private const val PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1
+        private const val REQUEST_CHECK_SETTINGS = 2
+
+        private const val KEY_REQUESTING_LOCATION_UPDATES = "requesting-location-updates"
+        private const val KEY_LOCATION = "location"
+        private const val KEY_LAST_UPDATED_TIME_STRING = "last-updated-time-string"
     }
 
     private lateinit var mMap: GoogleMap
@@ -33,7 +47,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var mLocationPermissionGranted = false
 
-    private lateinit var mLastKnownLocation: Location
+    lateinit var mLastKnownLocation: Location
+    private lateinit var mLocationRequest: LocationRequest
+    private lateinit var mLocationSettingsRequest: LocationSettingsRequest
+    private lateinit var mSettingsClient: SettingsClient
+    private var mLastUpdateTime = ""
+    private var mRequestingLocationUpdates = false
+
 
     private lateinit var mListView: View
     private lateinit var mListViewBehavior: BottomSheetBehavior<*>
@@ -45,6 +65,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mViewAdapter: RecyclerView.Adapter<*>
     private lateinit var mViewManager: RecyclerView.LayoutManager
 
+    private lateinit var key: String
+
     private lateinit var mData: Array<Marker?>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,8 +74,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
 
+        key = packageManager
+                .getApplicationInfo(packageName, PackageManager.GET_META_DATA)
+                .metaData.getString("com.google.android.geo.API_KEY")!!
         //region Map Logic
+
+        updateValuesFromBundle(savedInstanceState)
+
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        mSettingsClient = LocationServices.getSettingsClient(this)
+
+        createLocationCallback()
+        createLocationRequest()
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
@@ -86,7 +119,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                                 Util.focusedMarker!!.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
                             }
                         }
-                        else -> 0
                     }
                 }
 
@@ -107,7 +139,78 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val searchBar = findViewById<SearchView>(R.id.search_bar)
         // TODO: Implement search logic here
         //endregion
+    }
 
+    private lateinit var mLocationCallback: LocationCallback
+
+    private fun createLocationCallback() {
+
+        mLocationCallback = object: LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult) {
+                super.onLocationResult(locationResult)
+
+                mLastKnownLocation = locationResult.lastLocation
+                mLastUpdateTime = DateFormat.getTimeInstance().format(Date())
+            }
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        stopLocationUpdates()
+    }
+
+    private fun createLocationRequest() {
+        mLocationRequest = LocationRequest()
+        mLocationRequest.apply {
+            interval = Util.LOCATION_REQUEST_INTERVAL * 1000
+            fastestInterval = Util.LOCATION_REQUEST_FASTEST_INTERVAL * 1000
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        }
+    }
+
+    private fun stopLocationUpdates() {
+        mFusedLocationClient.removeLocationUpdates(mLocationCallback)
+    }
+
+    private inner class CustomLocationCallback: LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult?) {
+            locationResult ?: return
+            for (location in locationResult.locations) {
+                mLastKnownLocation = location
+            }
+        }
+    }
+
+    private fun updateValuesFromBundle(savedInstanceState: Bundle?) {
+        if (savedInstanceState != null) {
+            // Update the value of mRequestingLocationUpdates from the Bundle, and make sure that
+            // the Start Updates and Stop Updates buttons are correctly enabled or disabled.
+            if (savedInstanceState.keySet().contains(KEY_REQUESTING_LOCATION_UPDATES)) {
+                mRequestingLocationUpdates = savedInstanceState.getBoolean(
+                        KEY_REQUESTING_LOCATION_UPDATES)
+            }
+
+            // Update the value of mCurrentLocation from the Bundle and update the UI to show the
+            // correct latitude and longitude.
+            if (savedInstanceState.keySet().contains(KEY_LOCATION)) {
+                // Since KEY_LOCATION was found in the Bundle, we can be sure that mCurrentLocation
+                // is not null.
+                mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION)
+            }
+
+            // Update the value of mLastUpdateTime from the Bundle and update the UI.
+            if (savedInstanceState.keySet().contains(KEY_LAST_UPDATED_TIME_STRING)) {
+                mLastUpdateTime = savedInstanceState.getString(KEY_LAST_UPDATED_TIME_STRING)
+            }
+        }
+}
+
+
+    private fun buildLocationSettingsRequest() {
+        val builder = LocationSettingsRequest.Builder()
+        builder.addLocationRequest(mLocationRequest)
+        mLocationSettingsRequest = builder.build()
     }
 
 
@@ -138,7 +241,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
          * initialized in order to bind list items to their position on the map.
          */
         mViewManager = LinearLayoutManager(this)
-        mViewAdapter = ListAdapter(mData, mMap, mInfoView, mListViewBehavior, mInfoViewBehavior)
+        mViewAdapter = ListAdapter(mData, mMap, mInfoView, mListViewBehavior, mInfoViewBehavior, key)
         mRecyclerView = findViewById<RecyclerView>(R.id.recycler_view_list).apply {
             // Recycler view options
             setHasFixedSize(true)
@@ -148,9 +251,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         /*****************MY_LOCATION LOGIC BEGINS**********************/
 //        TODO: Change from get_last_location to get_location_updates
-//        getLocationPermission()
-//        updateLocationUI()
-//        getDeviceLocation()
+        getLocationPermission()
+        getDeviceLocation()
 
         /*****************MAP_OPTIONS BEGINS**********************/
         mMap.uiSettings.isMapToolbarEnabled = false
@@ -176,7 +278,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             }
             marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
 
-            Util.bindInfoToView(marker.tag as PointOfInterest, mInfoView, mMap)
+            Util.bindInfoToView(marker.tag as PointOfInterest, mInfoView, mMap,
+                    LatLng( mLastKnownLocation.latitude,
+                            mLastKnownLocation.longitude),
+                    key)
 
             Util.setPaddingAfterLayout(mInfoView, mMap, marker.position)
 
@@ -217,22 +322,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     mLocationPermissionGranted = true
                 }
             }
-        }
-        updateLocationUI()
-    }
-
-    private fun updateLocationUI() {
-        try {
-            if (mLocationPermissionGranted) {
-                mMap.isMyLocationEnabled = true
-                mMap.uiSettings.isMyLocationButtonEnabled = true
-            } else {
-                mMap.isMyLocationEnabled = false
-                mMap.uiSettings.isMyLocationButtonEnabled = false
-                getLocationPermission()
-            }
-        } catch (e: SecurityException) {
-            Log.e(TAG, e.message)
         }
     }
 
