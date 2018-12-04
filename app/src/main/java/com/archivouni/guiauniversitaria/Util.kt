@@ -1,5 +1,7 @@
 package com.archivouni.guiauniversitaria
 
+import android.graphics.Color
+import android.graphics.Paint
 import android.util.Log
 import android.view.View
 import android.view.ViewTreeObserver
@@ -7,11 +9,20 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
-import java.lang.Exception
+import android.os.AsyncTask
+import java.io.BufferedReader
+import java.io.InputStream
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URL
+import com.google.android.gms.maps.model.*
+import com.google.maps.android.PolyUtil
+import org.json.JSONArray
+import org.json.JSONObject
+import kotlin.Exception
+
 
 // This object hold project-wide constants and methods
 object Util {
@@ -19,6 +30,10 @@ object Util {
 
     //region Project-wide Constants
     const val IMAGE_SERVER_URL = "http://ec2-18-220-11-214.us-east-2.compute.amazonaws.com/"
+    const val GOOGLE_API_URL = "https://maps.googleapis.com/maps/api/directions/"
+
+    const val LOCATION_REQUEST_INTERVAL = 10L
+    const val LOCATION_REQUEST_FASTEST_INTERVAL = 5L
 
     const val DEFAULT_ZOOM = 16.15f
     const val MIN_ZOOM = 16.15f
@@ -33,7 +48,7 @@ object Util {
     const val UPR_BOUND_N = 18.41188018
     const val UPR_BOUND_E = -66.03826031
 
-    const val MAP_TILES_DIRECTORY = "map_tiles_bmp"
+//    const val MAP_TILES_DIRECTORY = "map_tiles_bmp"
 
     const val INFO_VIEW_PEEK_HEIGHT = 900
     const val LIST_VIEW_PEEK_HEIGHT = 600
@@ -61,15 +76,6 @@ object Util {
         }
     }
 
-    fun bindInfoToView(data: String?, textView: TextView) {
-        if (data != null) {
-            textView.text = data
-            textView.visibility = View.VISIBLE
-        } else {
-            textView.visibility = View.GONE
-        }
-    }
-
     fun bindInfoToView(poi: PointOfInterest, view: View, map: GoogleMap) {
         val imageView = view.findViewById<ImageView>(R.id.info_image)
         if (poi.images != null) {
@@ -78,9 +84,18 @@ object Util {
         } else {
             imageView.visibility = View.GONE
         }
-        bindInfoToView(poi.name, view.findViewById(R.id.info_name))
-        bindInfoToView(poi.acronym, view.findViewById(R.id.info_acronym))
-        bindInfoToView(poi.description, view.findViewById(R.id.info_description))
+        bindTextToView(poi.name, view.findViewById(R.id.info_name))
+//        bindTextToView(poi.acronym, view.findViewById(R.id.info_acronym))
+        bindTextToView(poi.description, view.findViewById(R.id.info_description))
+    }
+
+    fun bindTextToView(data: String?, textView: TextView) {
+        if (data != null) {
+            textView.text = data
+            textView.visibility = View.VISIBLE
+        } else {
+            textView.visibility = View.GONE
+        }
     }
 
     fun loadImageIntoView(url: String,
@@ -114,6 +129,135 @@ object Util {
         override fun onError(e: Exception?) {
             Log.e(TAG, "Unable to load image at $url")
         }
+    }
+
+    object DirectionsJSONParser {
+        private const val TAG_ROUTES = "routes"
+        private const val TAG_OVERVIEW_POLYLINE = "overview_polyline"
+        private const val TAG_POINTS="points"
+
+        fun parse(jObject: JSONObject): List<LatLng>? {
+            val jRoutes: JSONArray?
+
+            try {
+                jRoutes = jObject.getJSONArray(TAG_ROUTES)
+                if (jRoutes.length() > 0) {
+                    val overviewPolyline = (jRoutes[0] as JSONObject).getJSONObject(TAG_OVERVIEW_POLYLINE)
+                    val encodedPoints = overviewPolyline.getString(TAG_POINTS)
+                    return PolyUtil.decode(encodedPoints)
+                } else {
+                    throw Exception("No routes")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, e.toString())
+            }
+            return null
+        }
 
     }
+
+    private fun downloadUrl(strUrl: String): String {
+        var data = ""
+        var iStream: InputStream? = null
+        var urlConnection: HttpURLConnection? = null
+        try {
+            val url = URL(strUrl)
+
+            // Creating an http connection to communicate with url
+            urlConnection = url.openConnection() as HttpURLConnection
+
+            // Connecting to url
+            urlConnection.connect()
+
+            // Reading data from url
+            iStream = urlConnection.inputStream
+
+            val br = BufferedReader(InputStreamReader(iStream))
+
+            val sb = StringBuffer()
+
+            var line = br.readLine()
+            Log.d(TAG, line)
+            while (line != null) {
+                sb.append(line)
+                line = br.readLine()
+            }
+
+            data = sb.toString()
+
+            br.close()
+
+        } catch (e: Exception) {
+            Log.d(TAG, e.toString())
+        } finally {
+            iStream!!.close()
+            urlConnection!!.disconnect()
+        }
+        return data
+    }
+
+    // Fetches data from url passed
+    class DownloadTask(val map: GoogleMap): AsyncTask<String, Void, String>() {
+
+        // Downloading data in non-ui thread
+        override fun doInBackground(vararg url: String): String {
+
+            Log.d(TAG, "Downloading json from ${url[0]}")
+            // For storing data from web service
+            var data = ""
+
+            try {
+                // Fetching the data from web service
+                data = downloadUrl(url[0])
+            } catch (e: Exception) {
+                Log.d("Background Task", e.toString())
+            }
+
+            Log.d(TAG, "Data: $data")
+            return data
+        }
+
+        // Executes in UI thread, after the execution of
+        // doInBackground()
+        override fun onPostExecute(result: String) {
+            super.onPostExecute(result)
+
+            val parserTask = ParserTask(map)
+
+            // Invokes the thread for parsing the JSON data
+            parserTask.execute(result)
+        }
+    }
+
+    class ParserTask(val map: GoogleMap): AsyncTask<String, Void, List<LatLng>>() {
+
+        // Parsing the data in non-ui thread
+        override fun doInBackground(vararg jsonData: String): List<LatLng>? {
+            Log.d(TAG, "Parsing data")
+            val jObject: JSONObject
+            var route: List<LatLng>? = null
+
+            try {
+                jObject = JSONObject(jsonData[0])
+                route = DirectionsJSONParser.parse(jObject)
+                Log.d(TAG, route.toString())
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            return route
+        }
+
+        // Executes in UI thread, after the parsing process
+        override fun onPostExecute(result: List<LatLng>) {
+            val lineOptions = PolylineOptions().apply {
+                addAll(result)
+                width(4f)
+                color(Color.RED)
+            }
+
+            map.addPolyline(lineOptions)
+            Log.d(TAG, "Finished parsing")
+        }
+    }
+
 }

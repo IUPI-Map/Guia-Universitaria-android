@@ -2,14 +2,16 @@ package com.archivouni.guiauniversitaria
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.PendingIntent
+import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
 import android.os.Looper
 import android.os.PersistableBundle
 import android.util.Log
 import android.view.View
+import android.widget.ImageButton
 import android.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -22,6 +24,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import java.lang.Exception
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -30,14 +33,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         private const val PERMISSION_FINE_LOCATION_REQUEST_CODE = 1
         private const val REQUESTING_LOCATION_UPDATES_KEY = "requesting_location_updates"
+
+        private const val REQUEST_LOCATION_UPDATE_MIN_INTERVAL = 5L
+        private const val MIN_DISTANCE_CHANGE_FOR_UPDATES = 20f
     }
 
     private lateinit var mMap: GoogleMap
 
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
     private lateinit var mLastKnownLocation: Location
+    private lateinit var mLastKnownLatLng: LatLng
     private lateinit var mLocationRequest: LocationRequest
     private lateinit var mLocationCallback: LocationCallback
+    private lateinit var mLocationManager: LocationManager
+    private lateinit var mLocationListener: CustomLocationListener
+    private var mIsGpsEnabled = false
+    private var mIsNetworkEnabled = false
     private var mRequestingLocationUpdates = false
     private var mLocationPermissionDenied = false
 
@@ -51,7 +62,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mViewAdapter: RecyclerView.Adapter<*>
     private lateinit var mViewManager: RecyclerView.LayoutManager
 
+    private lateinit var mInfoRouteButton: ImageButton
+
     private lateinit var mData: Array<Marker?>
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -167,6 +182,27 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    fun bindRouteToButton(view: ImageButton, origin: LatLng, dest: LatLng) {
+        val url = getDirectionsUrl(origin, dest)
+        view.setOnClickListener {
+            Util.DownloadTask(mMap).execute(url)
+        }
+    }
+
+    private fun getDirectionsUrl(origin: LatLng, dest: LatLng): String {
+        val strOrigin = "origin=${origin.latitude},${origin.longitude}"
+        val strDest = "destination=${dest.latitude},${origin.longitude}"
+        val sensor = "sensor=false"
+        val mode = "mode=driving"
+        val params = "$strOrigin&$strDest&$sensor&$mode"
+        val output = "json"
+        return "${Util.GOOGLE_API_URL}$output?$params&key=" +
+                packageManager.getApplicationInfo(packageName,
+                        PackageManager.GET_META_DATA)
+                        .metaData
+                        .getString("com.google.android.geo.API_KEY")
+    }
+
 
     /**
      * Manipulates the map once available.
@@ -206,6 +242,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 //        TODO: Change from get_last_location to get_location_updates
 
         enableMyLocation()
+//        getLocation()
 
         /*****************MAP_OPTIONS BEGINS**********************/
         mMap.uiSettings.isMapToolbarEnabled = false
@@ -231,9 +268,20 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             }
             marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
 
+            val poi = marker.tag as PointOfInterest
             Util.bindInfoToView(marker.tag as PointOfInterest, mInfoView, mMap)
-
             Util.setPaddingAfterLayout(mInfoView, mMap, marker.position)
+
+            mInfoRouteButton = findViewById(R.id.info_route_button)
+            // TODO: Fix last known location
+//            if (mLastKnownLatLng != null) {
+//                mInfoRouteButton.setOnClickListener {
+//                    bindRouteToButton(it as ImageButton, upr, poi.latLng!!)
+//                }
+//            }
+            mInfoRouteButton.setOnClickListener {
+                bindRouteToButton(it as ImageButton, LatLng(18.405667, -66.050737), poi.latLng!!)
+            }
 
             mListViewBehavior.state = BottomSheetBehavior.STATE_HIDDEN
             mInfoViewBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
@@ -242,6 +290,79 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             true
         }
         //endregion
+    }
+
+    class CustomLocationListener: android.location.LocationListener {
+        override fun onStatusChanged(p0: String?, p1: Int, p2: Bundle?) {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        override fun onProviderEnabled(p0: String?) {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        override fun onProviderDisabled(p0: String?) {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        override fun onLocationChanged(p0: Location?) {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+    }
+    @SuppressLint("MissingPermission")
+    fun getLocation(): Location? {
+        try {
+            mLocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+            // getting GPS status
+            mIsGpsEnabled = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+
+            // getting network status
+            mIsNetworkEnabled = mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+
+            // no network provider is enabled
+            if (!mIsGpsEnabled && !mIsNetworkEnabled) {
+                // TODO: Ask to turn on location services
+            } else {
+                if (mIsNetworkEnabled) {
+                    mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                            REQUEST_LOCATION_UPDATE_MIN_INTERVAL * 1000L,
+                            MIN_DISTANCE_CHANGE_FOR_UPDATES,
+                            mLocationListener)
+                    Log.d("Network", "Network Enabled")
+                    if (mLocationManager != null) {
+                        mLastKnownLocation = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+                        if (mLastKnownLocation != null) {
+                            mLastKnownLatLng = LatLng(mLastKnownLocation!!.latitude, mLastKnownLocation!!.longitude)
+                        }
+                    }
+                }
+                // if GPS Enabled get lat/long using GPS Services
+                if (mIsGpsEnabled) {
+                    if (mLastKnownLocation == null) {
+                        mLocationManager.requestLocationUpdates(
+                                LocationManager.GPS_PROVIDER,
+                                REQUEST_LOCATION_UPDATE_MIN_INTERVAL,
+                                MIN_DISTANCE_CHANGE_FOR_UPDATES,
+                                mLocationListener)
+                        Log.d("GPS", "GPS Enabled")
+                        if (mLocationManager != null) {
+                            mLastKnownLocation = mLocationManager
+                                    .getLastKnownLocation(LocationManager.GPS_PROVIDER)
+                            if (mLastKnownLocation != null) {
+                                mLastKnownLatLng = LatLng(mLastKnownLocation!!.latitude, mLastKnownLocation!!.longitude)
+                            }
+                        }
+                    }
+                }
+            }
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        return mLastKnownLocation
     }
 
     /**
