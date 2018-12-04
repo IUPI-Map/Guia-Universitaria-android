@@ -5,7 +5,9 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
+import android.location.LocationListener
 import android.location.LocationManager
+import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Looper
 import android.os.PersistableBundle
@@ -17,6 +19,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -26,7 +30,12 @@ import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import java.lang.Exception
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
+class MapsActivity : AppCompatActivity(),
+        OnMapReadyCallback,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        GoogleMap.OnMarkerClickListener,
+        LocationListener{
 
     companion object {
         private const val TAG = "MapsActivity"
@@ -38,17 +47,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         private const val MIN_DISTANCE_CHANGE_FOR_UPDATES = 20f
     }
 
+    //region Activity Variables
     private lateinit var mMap: GoogleMap
 
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
-    private lateinit var mLastKnownLocation: Location
-    private lateinit var mLastKnownLatLng: LatLng
+    private lateinit var mGoogleApiClient: GoogleApiClient
+    private var mLastKnownLocation: Location? = null
+    private var mLastKnownLatLng: LatLng? = null
     private lateinit var mLocationRequest: LocationRequest
     private lateinit var mLocationCallback: LocationCallback
     private lateinit var mLocationManager: LocationManager
-    private lateinit var mLocationListener: CustomLocationListener
     private var mIsGpsEnabled = false
     private var mIsNetworkEnabled = false
+    private var mCanGetLocation = false
     private var mRequestingLocationUpdates = false
     private var mLocationPermissionDenied = false
 
@@ -65,9 +76,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mInfoRouteButton: ImageButton
 
     private lateinit var mData: Array<Marker?>
+    //endregion
 
-
-
+    //region Activity Lifecycle
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -76,11 +87,18 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         updateValuesFromBundle(savedInstanceState)
         //region Map Logic
         createLocationCallback()
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        mGoogleApiClient = GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build()
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         //endregion
 
         /*****************BOTTOM_SHEET BEGINS**********************/
@@ -98,19 +116,20 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             peekHeight = Util.INFO_VIEW_PEEK_HEIGHT
             setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
                 override fun onSlide(view: View, slideOffset: Float) {
+                    mMap.setPadding(0,0,0,0)
                 }
 
                 @SuppressLint("SwitchIntDef")
                 override fun onStateChanged(view: View, newState: Int) {
 
-                    when (newState) {
-                        BottomSheetBehavior.STATE_HIDDEN -> {
-                            mMap.setPadding(0, 0, 0, 0)
-                            if (Util.focusedMarker != null) {
-                                Util.focusedMarker!!.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
-                            }
-                        }
-                    }
+//                    when (newState) {
+//                        BottomSheetBehavior.STATE_HIDDEN -> {
+//                            mMap.setPadding(0, 0, 0, 0)
+//                            if (Util.focusedMarker != null) {
+//                                Util.focusedMarker!!.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+//                            }
+//                        }
+//                    }
                 }
 
             })
@@ -133,6 +152,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     }
 
+    override fun onStart() {
+        mGoogleApiClient.connect()
+        super.onStart()
+    }
+
     override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
         outState?.putBoolean(REQUESTING_LOCATION_UPDATES_KEY, mRequestingLocationUpdates)
         super.onSaveInstanceState(outState, outPersistentState)
@@ -148,62 +172,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onPause()
         stopLocationUpdates()
     }
+    //endregion
 
-    private fun createLocationCallback() {
-        mLocationCallback = object : LocationCallback() {
-            override fun onLocationResult(locationResult: LocationResult?) {
-                locationResult ?: return
-                locationResult.locations.forEach {
-                    mLastKnownLocation = it
-                }
-            }
-        }
-    }
-
-    private fun startLocationUpdates() {
-        try {
-            mFusedLocationClient.requestLocationUpdates(mLocationRequest,
-                    mLocationCallback,
-                    Looper.myLooper())
-        } catch (e: SecurityException) {
-            Log.e(TAG, e.toString())
-        }
-    }
-
-    private fun stopLocationUpdates() {
-        mFusedLocationClient.removeLocationUpdates(mLocationCallback)
-    }
-
-    private fun updateValuesFromBundle(savedInstanceState: Bundle?) {
-        savedInstanceState ?: return
-
-        if (savedInstanceState.containsKey(REQUESTING_LOCATION_UPDATES_KEY)) {
-            mRequestingLocationUpdates = savedInstanceState.getBoolean(REQUESTING_LOCATION_UPDATES_KEY)
-        }
-    }
-
-    fun bindRouteToButton(view: ImageButton, origin: LatLng, dest: LatLng) {
-        val url = getDirectionsUrl(origin, dest)
-        view.setOnClickListener {
-            Util.DownloadTask(mMap).execute(url)
-        }
-    }
-
-    private fun getDirectionsUrl(origin: LatLng, dest: LatLng): String {
-        val strOrigin = "origin=${origin.latitude},${origin.longitude}"
-        val strDest = "destination=${dest.latitude},${origin.longitude}"
-        val sensor = "sensor=false"
-        val mode = "mode=driving"
-        val params = "$strOrigin&$strDest&$sensor&$mode"
-        val output = "json"
-        return "${Util.GOOGLE_API_URL}$output?$params&key=" +
-                packageManager.getApplicationInfo(packageName,
-                        PackageManager.GET_META_DATA)
-                        .metaData
-                        .getString("com.google.android.geo.API_KEY")
-    }
-
-
+    //region Map Functions
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -261,57 +232,72 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap.setMinZoomPreference(Util.MIN_ZOOM)
         mMap.setMaxZoomPreference(Util.MAX_ZOOM)
 
-        mMap.setOnMarkerClickListener { marker ->
-            Log.d(TAG, "Focused marker: ${if (Util.focusedMarker != null) (Util.focusedMarker!!.tag as PointOfInterest).name else "none"}")
-            if (Util.focusedMarker != null) {
-                Util.focusedMarker!!.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
-            }
-            marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-
-            val poi = marker.tag as PointOfInterest
-            Util.bindInfoToView(marker.tag as PointOfInterest, mInfoView, mMap)
-            Util.setPaddingAfterLayout(mInfoView, mMap, marker.position)
-
-            mInfoRouteButton = findViewById(R.id.info_route_button)
-            // TODO: Fix last known location
-//            if (mLastKnownLatLng != null) {
-//                mInfoRouteButton.setOnClickListener {
-//                    bindRouteToButton(it as ImageButton, upr, poi.latLng!!)
-//                }
-//            }
-            mInfoRouteButton.setOnClickListener {
-                bindRouteToButton(it as ImageButton, LatLng(18.405667, -66.050737), poi.latLng!!)
-            }
-
-            mListViewBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-            mInfoViewBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-
-            Util.focusedMarker = marker
-            true
-        }
+        mMap.setOnMarkerClickListener(this)
         //endregion
     }
 
-    class CustomLocationListener: android.location.LocationListener {
-        override fun onStatusChanged(p0: String?, p1: Int, p2: Bundle?) {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun onMarkerClick(marker: Marker?): Boolean {
+        Log.d(TAG, "Focused marker: ${if (Util.focusedMarker != null) (Util.focusedMarker!!.tag as PointOfInterest).name else "none"}")
+        if (Util.focusedMarker != null) {
+            Util.focusedMarker!!.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
         }
+        marker!!.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
 
-        override fun onProviderEnabled(p0: String?) {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val poi = marker.tag as PointOfInterest
+
+        if (mCanGetLocation) {
+            mInfoRouteButton = findViewById(R.id.info_route_button)
+            if (mLastKnownLatLng != null) {
+                mInfoRouteButton.setOnClickListener {
+                    bindRouteToButton(it as ImageButton, mLastKnownLatLng!!, poi.latLng!!)
+                }
+            }
         }
+        Util.bindInfoToView(marker.tag as PointOfInterest, mInfoView, mMap)
+        Util.setPaddingAfterLayout(mInfoView, mMap, marker.position)
 
-        override fun onProviderDisabled(p0: String?) {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-        }
 
-        override fun onLocationChanged(p0: Location?) {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-        }
 
+        mListViewBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        mInfoViewBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+
+        Util.focusedMarker = marker
+        return true
     }
+    //endregion
+
+    //region Permission Functions
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>,
+                                            grantResults: IntArray) {
+        when (requestCode) {
+            PERMISSION_FINE_LOCATION_REQUEST_CODE -> {
+                // If request is cancelled, the result arrays are empty.
+                if (PermissionUtils.isPermissionGranted(permissions, grantResults, Manifest.permission.ACCESS_FINE_LOCATION))
+                    enableMyLocation()
+                else
+                    mLocationPermissionDenied = true
+            }
+        }
+    }
+
+    override fun onResumeFragments() {
+        super.onResumeFragments()
+        if (mLocationPermissionDenied) {
+            showMissingPermissionError()
+            mLocationPermissionDenied = false
+        }
+    }
+
+    private fun showMissingPermissionError() {
+        PermissionUtils.PermissionDeniedDialog().newInstance(true)
+                .show(supportFragmentManager, "dialog")
+    }
+    //endregion
+
+    //region Location functions
     @SuppressLint("MissingPermission")
-    fun getLocation(): Location? {
+    private fun getLocation(): Location? {
         try {
             mLocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
@@ -325,11 +311,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             if (!mIsGpsEnabled && !mIsNetworkEnabled) {
                 // TODO: Ask to turn on location services
             } else {
+                mCanGetLocation = true
                 if (mIsNetworkEnabled) {
+                    mLastKnownLocation = null
                     mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
                             REQUEST_LOCATION_UPDATE_MIN_INTERVAL * 1000L,
                             MIN_DISTANCE_CHANGE_FOR_UPDATES,
-                            mLocationListener)
+                            this)
                     Log.d("Network", "Network Enabled")
                     if (mLocationManager != null) {
                         mLastKnownLocation = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
@@ -345,7 +333,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                                 LocationManager.GPS_PROVIDER,
                                 REQUEST_LOCATION_UPDATE_MIN_INTERVAL,
                                 MIN_DISTANCE_CHANGE_FOR_UPDATES,
-                                mLocationListener)
+                                this)
                         Log.d("GPS", "GPS Enabled")
                         if (mLocationManager != null) {
                             mLastKnownLocation = mLocationManager
@@ -380,30 +368,96 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int,
-                                            permissions: Array<String>,
-                                            grantResults: IntArray) {
-        when (requestCode) {
-            PERMISSION_FINE_LOCATION_REQUEST_CODE -> {
-                // If request is cancelled, the result arrays are empty.
-                if (PermissionUtils.isPermissionGranted(permissions, grantResults, Manifest.permission.ACCESS_FINE_LOCATION))
-                    enableMyLocation()
-                else
-                    mLocationPermissionDenied = true
+    private fun createLocationCallback() {
+        mLocationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult?) {
+                locationResult ?: return
+                locationResult.locations.forEach {
+                    mLastKnownLocation = it
+                }
             }
         }
     }
 
-    override fun onResumeFragments() {
-        super.onResumeFragments()
-        if (mLocationPermissionDenied) {
-            showMissingPermissionError()
-            mLocationPermissionDenied = false
+    private fun startLocationUpdates() {
+        try {
+            mFusedLocationClient.requestLocationUpdates(mLocationRequest,
+                    mLocationCallback,
+                    Looper.myLooper())
+        } catch (e: SecurityException) {
+            Log.e(TAG, e.toString())
         }
     }
 
-    private fun showMissingPermissionError() {
-        PermissionUtils.PermissionDeniedDialog().newInstance(true)
-                .show(supportFragmentManager, "dialog")
+    private fun stopLocationUpdates() {
+        mFusedLocationClient.removeLocationUpdates(mLocationCallback)
+    }
+
+    private fun updateValuesFromBundle(savedInstanceState: Bundle?) {
+        savedInstanceState ?: return
+
+        if (savedInstanceState.containsKey(REQUESTING_LOCATION_UPDATES_KEY)) {
+            mRequestingLocationUpdates = savedInstanceState.getBoolean(REQUESTING_LOCATION_UPDATES_KEY)
+        }
+    }
+    //endregion
+
+    fun bindRouteToButton(view: ImageButton, origin: LatLng, dest: LatLng) {
+        val url = getDirectionsUrl(origin, dest)
+        view.setOnClickListener {
+            Util.DownloadTask(mMap).execute(url)
+        }
+    }
+
+    private fun getDirectionsUrl(origin: LatLng, dest: LatLng): String {
+        val strOrigin = "origin=${origin.latitude},${origin.longitude}"
+        val strDest = "destination=${dest.latitude},${dest.longitude}"
+        val mode = "mode=walking"
+        val params = "$strOrigin&$strDest&$mode"
+        val output = "json"
+        return "${Util.GOOGLE_API_URL}$output?$params&key=" +
+                packageManager.getApplicationInfo(packageName,
+                        PackageManager.GET_META_DATA)
+                        .metaData
+                        .getString("com.google.android.geo.API_KEY")
+    }
+
+
+
+
+//    inner class LastLocation: AsyncTask<Void, Void, Location>() {
+//        override fun doInBackground(vararg params: Void?): Location {
+//        }
+//    }
+
+    override fun onStop() {
+        mGoogleApiClient.disconnect()
+        super.onStop()
+    }
+
+    override fun onProviderDisabled(provider: String?) {
+    }
+
+    override fun onProviderEnabled(provider: String?) {
+    }
+
+    override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
+    }
+
+    override fun onLocationChanged(p0: Location?) {
+        if (p0 != null) {
+            mLastKnownLocation = p0
+            mLastKnownLatLng = LatLng(mLastKnownLocation!!.latitude, mLastKnownLocation!!.longitude)
+        }
+    }
+
+    override fun onConnectionFailed(p0: ConnectionResult) {
+    }
+
+    override fun onConnectionSuspended(p0: Int) {
+    }
+
+    override fun onConnected(p0: Bundle?) {
+        getLocation()
     }
 }
