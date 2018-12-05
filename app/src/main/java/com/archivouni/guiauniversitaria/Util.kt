@@ -57,7 +57,6 @@ object Util{
     private const val READ_TIMEOUT = 15
     //endregion
 
-
     private val cachedRoutes = HashMap<String, Polyline>()
     var currentRoutes = MutableList<Polyline?>(0) { null }
 
@@ -197,7 +196,7 @@ object Util{
             if (this.isCancelled)
                 return null
 
-            Log.d(TAG, "Downloading json from $url")
+            Log.d("$TAG.DownloadTask", "Downloading json from $url")
             // For storing data from web service
             var data: String? = null
 
@@ -205,12 +204,10 @@ object Util{
                 // Fetching the data from web service
                 data = downloadUrl(url)
             } catch (e: UnknownHostException) {
-                Log.e(TAG, "Unable to connect to host: $url")
+                Log.e("$TAG.DownloadTask", "Unable to connect to host: $url")
             } catch (e: Exception) {
-                Log.d("Tag", e.toString())
+                Log.d("$TAG.DownloadTask", e.toString())
             }
-
-            Log.d(TAG, "Data: $data")
             return data
         }
 

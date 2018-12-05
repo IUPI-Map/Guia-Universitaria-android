@@ -10,4 +10,8 @@
         <item name="android:textColorPrimary">@color/colorText</item>
     </style>
 
+    <style name="SplashTheme" parent="AppTheme">
+        <item name="android:windowBackground">@drawable/splash_background</item>
+    </style>
+
 </resources>
