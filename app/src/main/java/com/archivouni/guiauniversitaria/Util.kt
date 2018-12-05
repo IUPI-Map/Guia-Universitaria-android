@@ -22,6 +22,7 @@ import com.google.maps.android.PolyUtil
 import org.json.JSONArray
 import org.json.JSONObject
 import java.net.UnknownHostException
+import java.util.*
 import kotlin.Exception
 
 
@@ -58,7 +59,7 @@ object Util{
 
 
     private val cachedRoutes = HashMap<String, Polyline>()
-    private var currentRoute: Polyline? = null
+    var currentRoutes = MutableList<Polyline?>(0) { null }
 
     fun bindTextToView(data: String?, textView: TextView?) {
         if (textView == null) {
@@ -214,15 +215,17 @@ object Util{
         }
 
         override fun onCancelled() {
-            currentRoute?.remove()
-            currentRoute = cachedRoutes[url]
-            map.addPolyline(createLineOptions(currentRoute?.points))
+            currentRoutes.apply {
+                forEach { polyline ->
+                    polyline?.remove()
+                }
+                add(map.addPolyline(createLineOptions(cachedRoutes[url]?.points)))
+            }
         }
 
         // Executes in UI thread, after the execution of
         // doInBackground()
         override fun onPostExecute(result: String?) {
-            currentRoute?.remove()
             result ?: return
 
             val parserTask = ParserTask(url, map)
@@ -258,9 +261,11 @@ object Util{
             }
 
             // Add route to map and store in hashmap with url as key
-            currentRoute = map.addPolyline(createLineOptions(result)).also { polyline ->
-                cachedRoutes[url] = polyline
-            }
+            currentRoutes.add(map.addPolyline(createLineOptions(result))
+                    .also { polyline ->
+                        cachedRoutes[url] = polyline
+                    }
+            )
             Log.d("$TAG.ParserTask", "Route added to map")
         }
     }
