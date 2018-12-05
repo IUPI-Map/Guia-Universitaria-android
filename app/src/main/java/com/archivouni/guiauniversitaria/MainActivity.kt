@@ -325,7 +325,8 @@ class MainActivity : AppCompatActivity(),
         Util.bindTextToView(poi.name, findViewById(R.id.info_name))
 //        bindTextToView(poi.acronym, view.findViewById(R.id.info_acronym))
         Util.bindTextToView(poi.description, findViewById(R.id.info_description))
-        bindRouteToButton(mInfoRouteButton, mLastKnownLatLng!!, poi.latLng!!)
+        if (mCanGetLocation)
+            bindRouteToButton(mInfoRouteButton, mLastKnownLatLng!!, poi.latLng!!)
         mMap.setPadding(0,0,0, INFO_VIEW_PEEK_HEIGHT)
     }
 
