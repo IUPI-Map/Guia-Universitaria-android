@@ -115,6 +115,9 @@ class MainActivity : AppCompatActivity(),
     fun bindRouteToButton(view: ImageButton, origin: LatLng, dest: LatLng) {
         val url = getDirectionsUrl(origin, dest)
         view.setOnClickListener {
+            Util.currentRoutes.forEach { polyline ->
+                polyline?.remove()
+            }
             Util.DownloadTask(mMap).execute(url)
         }
     }
