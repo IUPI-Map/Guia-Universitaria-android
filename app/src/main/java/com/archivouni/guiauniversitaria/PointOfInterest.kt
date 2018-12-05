@@ -13,8 +13,10 @@ import org.json.JSONObject
 class Response(json: String): JSONArray(json) {
     val data = this
             .let { poiArray ->
-                0.until(poiArray.length()).map { index -> poiArray.getJSONObject(index) } }
-            .map { PointOfInterest(it.toString()) }
+                0.until(poiArray.length()).map { index ->
+                    poiArray.getJSONObject(index) } }
+            .map { jObject ->
+                PointOfInterest(jObject.toString()) }
             .toTypedArray()
 }
 
@@ -61,12 +63,11 @@ class PointOfInterest(json: String): JSONObject(json) {
     val latLng: LatLng? = LatLng(getDouble(TAG_LATITUDE), getDouble(TAG_LONGITUDE))
     // Convert JSONArray to array of strings
     val images = getJSONArray(TAG_IMAGES).let { imgArray ->
-        if (imgArray.length() > 0) {
+        if (imgArray.length() > 0)
             Array(imgArray.length()) { i ->
                 imgArray[i].toString()
             }
-        } else {
+        else
             null
-        }
     }
 }

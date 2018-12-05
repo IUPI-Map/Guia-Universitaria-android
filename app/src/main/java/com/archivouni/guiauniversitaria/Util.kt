@@ -12,7 +12,6 @@ import com.google.android.gms.maps.GoogleMap
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import android.os.AsyncTask
-import com.archivouni.guiauniversitaria.R.id.map
 import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
@@ -20,7 +19,6 @@ import java.net.HttpURLConnection
 import java.net.URL
 import com.google.android.gms.maps.model.*
 import com.google.maps.android.PolyUtil
-import com.squareup.picasso.Request
 import org.json.JSONArray
 import org.json.JSONObject
 import java.net.UnknownHostException
@@ -28,71 +26,46 @@ import kotlin.Exception
 
 
 // This object hold project-wide constants and methods
-object Util {
+object Util{
     private const val TAG = "Util"
 
     //region Project-wide Constants
     const val IMAGE_SERVER_URL = "http://ec2-18-220-11-214.us-east-2.compute.amazonaws.com/"
     const val GOOGLE_API_URL = "https://maps.googleapis.com/maps/api/directions/"
+    // const val MAP_TILES_DIRECTORY = "map_tiles_bmp"
 
     const val LOCATION_REQUEST_INTERVAL = 10L
     const val LOCATION_REQUEST_FASTEST_INTERVAL = 5L
 
-    const val DEFAULT_ZOOM = 16.15f
-    const val MIN_ZOOM = 16.15f
-    const val MAX_ZOOM = 19f
-    const val FOCUS_ZOOM = 17.5f
 
-    const val DEFAULT_LATITUDE = 18.404123
-    const val DEFAULT_LONGITUDE = -66.048714
-
-    const val UPR_BOUND_S = 18.39926710
-    const val UPR_BOUND_W = -66.05599693
-    const val UPR_BOUND_N = 18.41188018
-    const val UPR_BOUND_E = -66.03826031
-
-//    const val MAP_TILES_DIRECTORY = "map_tiles_bmp"
-
-    const val INFO_VIEW_PEEK_HEIGHT = 900
-    const val LIST_VIEW_PEEK_HEIGHT = 600
     //endregion
 
-    var infoViewHeight = 0
-    var focusedMarker: Marker? = null
+    //region Util Constants
+    private const val POLYLINE_WIDTH = 40f
+    private const val POLYLINE_COLOR = Color.BLACK
+    // End cap options: square, round, butt (default)
+    private const val POLYLINE_START_CAP = "round"
+    private const val POLYLINE_END_CAP = "round"
+    // Joint type options: bevel, round, default
+    private const val POLYLINE_JOINT_TYPE = JointType.BEVEL
+    // Pattern options: gap, dash, dot, solid (default)
+    private const val POLYLINE_STROKE_PATTERN = "dot"
+    private const val POLYLINE_STROKE_LENGTH = 16f
 
-    fun setPaddingAfterLayout(view: View, map: GoogleMap, pos: LatLng? = null) {
-        if (focusedMarker != null && focusedMarker!!.position == pos) {
-            map.setPadding(0,0,0, infoViewHeight)
+    private const val CONNECT_TIMEOUT = 15
+    private const val READ_TIMEOUT = 15
+    //endregion
+
+
+    private val cachedRoutes = HashMap<String, Polyline>()
+    private var currentRoute: Polyline? = null
+
+    fun bindTextToView(data: String?, textView: TextView?) {
+        if (textView == null) {
+            Log.e("Data Binding", "Textview not found")
             return
         }
-        view.apply {
-            viewTreeObserver.addOnGlobalLayoutListener(object: ViewTreeObserver.OnGlobalLayoutListener {
-                override fun onGlobalLayout() {
-                    this@apply.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                    infoViewHeight = minOf(this@apply.height, INFO_VIEW_PEEK_HEIGHT)
-                    Log.d(TAG, "Padding: " + infoViewHeight.toString())
-                    map.setPadding(0,0,0,infoViewHeight)
-                    if (pos != null)
-                        map.animateCamera(CameraUpdateFactory.newLatLngZoom(pos, FOCUS_ZOOM))
-                }
-            })
-        }
-    }
 
-    fun bindInfoToView(poi: PointOfInterest, view: View, map: GoogleMap) {
-        val imageView = view.findViewById<ImageView>(R.id.info_image)
-        if (poi.images != null) {
-            imageView.visibility = View.VISIBLE
-            loadImageIntoView(IMAGE_SERVER_URL + poi.images[0], imageView, map)
-        } else {
-            imageView.visibility = View.GONE
-        }
-        bindTextToView(poi.name, view.findViewById(R.id.info_name))
-//        bindTextToView(poi.acronym, view.findViewById(R.id.info_acronym))
-        bindTextToView(poi.description, view.findViewById(R.id.info_description))
-    }
-
-    fun bindTextToView(data: String?, textView: TextView) {
         if (data != null) {
             textView.text = data
             textView.visibility = View.VISIBLE
@@ -102,35 +75,39 @@ object Util {
     }
 
     fun loadImageIntoView(url: String,
-                          imageView: ImageView,
-                          map: GoogleMap,
+                          imageView: ImageView?,
                           fit: Boolean = false,
                           width: Int = 500,
-                          height: Int = 500) {
+                          height: Int = 500,
+                          callback: Callback = LoadImageCallback()) {
+        if (imageView == null) {
+            Log.e("Data Binding", "Imageview not found")
+            return
+        }
         if (fit) {
             Picasso.get().load(url)
                     .fit()
                     .placeholder(R.drawable.progress_animation)
-                    .into(imageView, LoadImageCallback(url, imageView, map))
+                    .into(imageView, callback)
         } else {
             Picasso.get().load(url)
                     .resize(width, height)
                     .placeholder(R.drawable.progress_animation)
-                    .into(imageView, LoadImageCallback(url, imageView, map))
+                    .into(imageView, callback)
         }
     }
 
-    class LoadImageCallback(private val url: String, val view: View, val map: GoogleMap): Callback {
+    class LoadImageCallback: Callback {
         companion object {
             private const val TAG = "LoadImageCallback"
         }
 
         override fun onSuccess() {
-            setPaddingAfterLayout(view.parent as View, map)
+            Log.d(TAG, "Succesfully loaded image")
         }
 
         override fun onError(e: Exception?) {
-            Log.e(TAG, "Unable to load image at $url")
+            Log.e(TAG, "Unable to load image")
         }
     }
 
@@ -143,15 +120,12 @@ object Util {
 
         fun parse(jObject: JSONObject): List<LatLng>? {
             val jRoutes: JSONArray?
-            var jLegs: JSONArray?
-            var jSteps: JSONArray?
 
             try {
                 jRoutes = jObject.getJSONArray(TAG_ROUTES)
                 if (jRoutes.length() > 0) {
                     val overviewPolyline = (jRoutes.get(0) as JSONObject).getJSONObject(TAG_OVERVIEW_POLYLINE)
                     val encodedPoints = overviewPolyline.getString(TAG_POINTS)
-                    Log.d(TAG, "Polyline: $encodedPoints")
                     return PolyUtil.decode(encodedPoints)
                 } else {
                     throw Exception("No routes")
@@ -164,7 +138,7 @@ object Util {
 
     }
 
-    private fun downloadUrl(strUrl: String): String {
+    fun downloadUrl(strUrl: String): String {
         var data = ""
         var iStream: InputStream? = null
         var urlConnection: HttpURLConnection? = null
@@ -174,25 +148,22 @@ object Util {
             // Creating an http connection to communicate with url
             urlConnection = (url.openConnection() as HttpURLConnection)
                     .apply {
-                        readTimeout = 15 * 1000
-                        connectTimeout = 15 * 1000
+                        readTimeout = READ_TIMEOUT * 1000
+                        connectTimeout = CONNECT_TIMEOUT * 1000
                         requestMethod = "GET"
                     }
 
             // Connecting to url
             urlConnection.connect()
-            Log.d(TAG, "Connected to host")
 
             // Reading data from url
             iStream = urlConnection.inputStream
-            Log.d(TAG, iStream.toString())
 
             val br = BufferedReader(InputStreamReader(iStream))
 
             val sb = StringBuffer()
 
             var line = br.readLine()
-            Log.d(TAG, line)
             while (line != null) {
                 sb.append(line)
                 line = br.readLine()
@@ -212,20 +183,28 @@ object Util {
     }
 
     // Fetches data from url passed
-    class DownloadTask(val map: GoogleMap): AsyncTask<String, Void, String?>() {
+    class DownloadTask(private val map: GoogleMap): AsyncTask<String, Void, String?>() {
+        private lateinit var url: String
 
         // Downloading data in non-ui thread
-        override fun doInBackground(vararg url: String): String {
+        override fun doInBackground(vararg urls: String): String? {
+            url = urls[0]
+            if (cachedRoutes.containsKey(url)) {
+                Log.d("$TAG.DownloadTask", "Route already cached, cancelling download")
+                this.cancel(true)
+            }
+            if (this.isCancelled)
+                return null
 
-            Log.d(TAG, "Downloading json from ${url[0]}")
+            Log.d(TAG, "Downloading json from $url")
             // For storing data from web service
-            var data = ""
+            var data: String? = null
 
             try {
                 // Fetching the data from web service
-                data = downloadUrl(url[0])
+                data = downloadUrl(url)
             } catch (e: UnknownHostException) {
-                Log.e(TAG, "Unable to connect to host: ${url[0]}")
+                Log.e(TAG, "Unable to connect to host: $url")
             } catch (e: Exception) {
                 Log.d("Tag", e.toString())
             }
@@ -234,34 +213,36 @@ object Util {
             return data
         }
 
+        override fun onCancelled() {
+            currentRoute?.remove()
+            currentRoute = cachedRoutes[url]
+            map.addPolyline(createLineOptions(currentRoute?.points))
+        }
+
         // Executes in UI thread, after the execution of
         // doInBackground()
         override fun onPostExecute(result: String?) {
+            currentRoute?.remove()
+            result ?: return
 
-            if (result == null) {
-                return
-            }
-            Log.d(TAG,"json length: ${result.length}")
-            val parserTask = ParserTask(map)
+            val parserTask = ParserTask(url, map)
 
             // Invokes the thread for parsing the JSON data
             parserTask.execute(result)
         }
     }
 
-    class ParserTask(val map: GoogleMap): AsyncTask<String, Void, List<LatLng>?>() {
+    class ParserTask(private val url: String, private val map: GoogleMap): AsyncTask<String, Void, List<LatLng>?>() {
 
         // Parsing the data in non-ui thread
         override fun doInBackground(vararg jsonData: String): List<LatLng>? {
-            Log.d(TAG, "Parsing data")
+            Log.d("$TAG.ParserTask", "Parsing data . . .")
             val jObject: JSONObject
             val route: List<LatLng>?
 
             try {
-                Log.d(TAG, "Test")
                 jObject = JSONObject(jsonData[0])
                 route = DirectionsJSONParser.parse(jObject)
-                Log.d(TAG, route.toString())
                 return route
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -272,19 +253,40 @@ object Util {
         // Executes in UI thread, after the parsing process
         override fun onPostExecute(result: List<LatLng>?) {
             if (result == null) {
-                Log.e(TAG, "Data not found")
+                Log.e("$TAG.ParserTask", "Error parsing data")
                 return
             }
-            val lineOptions = PolylineOptions().apply {
-                addAll(result)
-                width(8f)
-                zIndex(4f)
-                color(Color.RED)
-                visible(true)
+
+            // Add route to map and store in hashmap with url as key
+            currentRoute = map.addPolyline(createLineOptions(result)).also { polyline ->
+                cachedRoutes[url] = polyline
             }
-            var x = map.addPolyline(lineOptions)
-            Log.d(TAG, "Finished parsing")
+            Log.d("$TAG.ParserTask", "Route added to map")
         }
     }
 
+    private fun createLineOptions(points: List<LatLng>?): PolylineOptions {
+        return PolylineOptions().addAll(points)
+                .width(POLYLINE_WIDTH)
+                .color(POLYLINE_COLOR)
+                .startCap(when (POLYLINE_START_CAP) {
+                    "round" -> RoundCap()
+                    "square" -> SquareCap()
+                    else -> ButtCap()
+                })
+                .endCap(when (POLYLINE_END_CAP) {
+                    "round" -> RoundCap()
+                    "square" -> SquareCap()
+                    else -> ButtCap()
+                })
+                .pattern(List(points!!.size) {
+                    when (POLYLINE_STROKE_PATTERN) {
+                        "dash" -> Dash(POLYLINE_STROKE_LENGTH)
+                        "gap" -> Gap(POLYLINE_STROKE_LENGTH)
+                        "dot" -> Dot()
+                        else -> null
+                    }
+                })
+                .jointType(POLYLINE_JOINT_TYPE)
+    }
 }

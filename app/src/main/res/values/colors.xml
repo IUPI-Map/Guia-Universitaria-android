@@ -2,9 +2,17 @@
 <resources>
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF0000</color>
+    <color name="colorAccent">#000000</color>
     <color name="colorBackground">#eeeeee</color>
     <color name="colorItem">#FFFFFF</color>
     <color name="colorText">#000000</color>
     <color name="colorSubText">#616161</color>
+    <!--<color name="colorPrimaryVariant">#000000</color>-->
+    <!--<color name="colorSecondaryVariant">#000000</color>-->
+    <!--<color name="colorSurface">#000000</color>-->
+    <!--<color name="colorOnPrimary">#000000</color>-->
+    <!--<color name="colorOnSecondary">#000000</color>-->
+    <!--<color name="colorOnBackground">#000000</color>-->
+    <!--<color name="colorOnError">#000000</color>-->
+    <!--<color name="colorOnSurface">#000000</color>-->
 </resources>
