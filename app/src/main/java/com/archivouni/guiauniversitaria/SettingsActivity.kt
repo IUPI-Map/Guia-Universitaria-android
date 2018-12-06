@@ -36,10 +36,5 @@ class SettingsActivity : AppCompatActivity() {
             val contactoIntent = Intent(this, ContactActivity::class.java)
             startActivity(contactoIntent)
         }
-
-        // Closes the Settings Activity
-        close_settings.setOnClickListener{
-            finish()
-        }
     }
 }

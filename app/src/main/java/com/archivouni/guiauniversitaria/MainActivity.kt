@@ -3,6 +3,7 @@ package com.archivouni.guiauniversitaria
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
@@ -109,7 +110,7 @@ class MainActivity : AppCompatActivity(),
     private lateinit var mViewAdapter: RecyclerView.Adapter<*>
     private lateinit var mViewManager: RecyclerView.LayoutManager
 
-    private lateinit var mSettingsButton: FloatingActionButton
+    private lateinit var mSettingsButton: ImageButton
 
     private lateinit var mInfoRouteButton: ImageButton
 
@@ -154,10 +155,6 @@ class MainActivity : AppCompatActivity(),
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        /*****************LIST VIEW BEGINS**********************/
-        //preloads data for the searchBar
-        /***************************************************************************************************/
-
         /*****************BOTTOM_SHEET BEGINS**********************/
         //region POI List View
         mListView = findViewById(R.id.list_view)
@@ -199,6 +196,9 @@ class MainActivity : AppCompatActivity(),
         }
 
         mSettingsButton = findViewById(R.id.button_open_settings)
+        mSettingsButton.setOnClickListener {
+            startActivity(Intent(this, SettingsActivity::class.java))
+        }
 
         /*****************SEARCH_BAR BEGINS**********************/
 //        val  = findViewById<SearchView>(R.id.search_bar)

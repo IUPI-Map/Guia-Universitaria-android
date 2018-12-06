@@ -8,7 +8,7 @@
     android:orientation="vertical"
     tools:context=".ContactActivity">
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -19,7 +19,7 @@
         android:textSize="24sp" />
 
     <!--EditText: Input the message-->
-    <EditText
+    <androidx.appcompat.widget.AppCompatEditText
         android:id="@+id/messageEt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -28,21 +28,10 @@
         android:minHeight="250dp" />
 
     <!--Button: Launch existing mail clients to send email-->
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/sendEmailBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
         android:text="Enviar correo" />
-
-    <!--Button: Closes the Activity-->
-    <Button
-        android:id="@+id/closeContactBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="100dp"
-        android:backgroundTint="@android:color/holo_red_dark"
-        android:text="Finalizar"
-        android:textColor="@color/colorBackground" />
 </LinearLayout>

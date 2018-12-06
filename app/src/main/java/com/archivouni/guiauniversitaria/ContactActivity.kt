@@ -23,12 +23,6 @@ class ContactActivity : AppCompatActivity() {
             //method call for email intent with these inputs as parameters
             sendEmail(recipient, subject, message)
         }
-
-
-        // Closes the Contact Activity
-        closeContactBtn.setOnClickListener{
-            finish()
-        }
     }
 
     private fun sendEmail(recipient: String, subject: String, message: String) {
