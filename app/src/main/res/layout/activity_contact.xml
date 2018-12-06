@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:backgroundTint="@color/colorPrimary"
+    android:orientation="vertical"
+    tools:context=".ContactActivity">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="24dp"
+        android:text="Entre su comentario o sugerencia sobre la aplicación"
+        android:textAlignment="textStart"
+        android:textAllCaps="false"
+        android:textSize="24sp" />
+
+    <!--EditText: Input the message-->
+    <EditText
+        android:id="@+id/messageEt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:hint="Entre el mensaje"
+        android:minHeight="250dp" />
+
+    <!--Button: Launch existing mail clients to send email-->
+    <Button
+        android:id="@+id/sendEmailBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:text="Enviar correo" />
+
+    <!--Button: Closes the Activity-->
+    <Button
+        android:id="@+id/closeContactBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="100dp"
+        android:backgroundTint="@android:color/holo_red_dark"
+        android:text="Finalizar"
+        android:textColor="@color/colorBackground" />
+</LinearLayout>
