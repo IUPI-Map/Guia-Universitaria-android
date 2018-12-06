@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".DetailsActivity">
+
+    <TextView
+        android:id="@+id/detail_text_view"
+        android:layout_width="338dp"
+        android:layout_height="465dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="11dp"
+        android:saveEnabled="false"
+        android:scrollbars="vertical"
+        android:text="¡Bienvenidos!
+
+IupiMap es el mapa del Recinto de Río Piedras de la UPR, donde puedes encontrar los edificios, su historia y otros puntos de interés.
+Un proyecto del Archivo Universitario del Recinto de Río Piedras.
+
+- - - - - - - - - - - -
+
+Acerca del Archivo Universitario y esta plataforma:
+El Archivo Universitario (AU) desde el 1926 es responsable de custodiar el acervo
+histórico documental del Recinto de Río Piedras. Esta plataforma del mapa del Recinto de Río Piedras promueve el conocimiento a la historia de los edificios y espacios del Recinto.
+
+- - - - - - - - - - - -
+
+Esta aplicación fue una colaboración del curso CCOM-4030 y los estudiantes José G. Vélez Gómez, Marc A. De Jesús Ellsworth, José A. Quiñones Flores y Roberto C. López Rivera.
+
+- - - - - - - - - - - -
+
+Aida I. Irizarry Martínez, Directora y Administradora de Documentos del AU
+Si tienes alguna sugerencia favor de enviar un correo electrónico a: aida.irizarry@upr.edu
+
+- - - - - - - - - - - -
+
+Fotografías e información: Archivo Universitario, Archivo de Arquitectura y
+Construcción.
+
+"
+        app:layout_constraintBottom_toTopOf="@+id/close_detail"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/close_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="148dp"
+        android:layout_marginTop="11dp"
+        android:layout_marginEnd="143dp"
+        android:layout_marginBottom="27dp"
+        android:backgroundTint="@android:color/holo_red_dark"
+        android:text="Finalizar"
+        android:textColor="@color/colorBackground"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+</androidx.constraintlayout.widget.ConstraintLayout>
