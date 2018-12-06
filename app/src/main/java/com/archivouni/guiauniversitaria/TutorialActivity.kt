@@ -13,8 +13,6 @@ class TutorialActivity : AppCompatActivity() {
 
     companion object {
         private const val TAG = "TutorialActivity"
-
-        private const val SCREEN_COUNT = 4
     }
 
     private val mTutorialScreens = arrayOf(R.drawable.tutorial01,
@@ -35,21 +33,24 @@ class TutorialActivity : AppCompatActivity() {
         setContentView(R.layout.activity_tutorial)
 
         mScreenView = findViewById(R.id.tutorial_image)
+        mScreenView.setImageResource(mTutorialScreens[mCurrentScreen])
 
         mNextButton = findViewById(R.id.tutorial_button_next)
         mNextButton.setOnClickListener {
-            if (++mCurrentScreen == mTutorialScreens.size)
-                it.visibility = View.GONE
-            mPrevButton.visibility = View.VISIBLE
+            mCurrentScreen++
             mScreenView.setImageResource(mTutorialScreens[mCurrentScreen])
+            mPrevButton.visibility = View.VISIBLE
+            if (mCurrentScreen == mTutorialScreens.size - 1)
+                it.visibility = View.GONE
         }
 
         mPrevButton = findViewById(R.id.tutorial_button_prev)
         mPrevButton.setOnClickListener {
-            if (--mCurrentScreen == 0)
-                it.visibility = View.GONE
-            mNextButton.visibility = View.VISIBLE
+            mCurrentScreen--
             mScreenView.setImageResource(mTutorialScreens[mCurrentScreen])
+            mNextButton.visibility = View.VISIBLE
+            if (mCurrentScreen == 0)
+                it.visibility = View.GONE
         }
         mQuitButton = findViewById(R.id.tutorial_quit_button)
         mQuitButton.setOnClickListener {
