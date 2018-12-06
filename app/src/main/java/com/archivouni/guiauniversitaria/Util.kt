@@ -42,7 +42,7 @@ object Util{
     //endregion
 
     //region Util Constants
-    private const val POLYLINE_WIDTH = 40f
+    private const val POLYLINE_WIDTH = 20f
     private const val POLYLINE_COLOR = Color.BLACK
     // End cap options: square, round, butt (default)
     private const val POLYLINE_START_CAP = "round"
@@ -50,7 +50,7 @@ object Util{
     // Joint type options: bevel, round, default
     private const val POLYLINE_JOINT_TYPE = JointType.BEVEL
     // Pattern options: gap, dash, dot, solid (default)
-    private const val POLYLINE_STROKE_PATTERN = "dot"
+    private const val POLYLINE_STROKE_PATTERN = "solid"
     private const val POLYLINE_STROKE_LENGTH = 16f
 
     private const val CONNECT_TIMEOUT = 15
@@ -184,6 +184,7 @@ object Util{
 
     // Fetches data from url passed
     class DownloadTask(private val map: GoogleMap): AsyncTask<String, Void, String?>() {
+        // TODO: Give progress updates
         private lateinit var url: String
 
         // Downloading data in non-ui thread
@@ -281,14 +282,18 @@ object Util{
                     "square" -> SquareCap()
                     else -> ButtCap()
                 })
-                .pattern(List(points!!.size) {
-                    when (POLYLINE_STROKE_PATTERN) {
-                        "dash" -> Dash(POLYLINE_STROKE_LENGTH)
-                        "gap" -> Gap(POLYLINE_STROKE_LENGTH)
-                        "dot" -> Dot()
-                        else -> null
-                    }
-                })
                 .jointType(POLYLINE_JOINT_TYPE)
+                .apply {
+                    if (POLYLINE_STROKE_PATTERN != "solid") {
+                        pattern(List(points!!.size) {
+                            when (POLYLINE_STROKE_PATTERN) {
+                                "dash" -> Dash(POLYLINE_STROKE_LENGTH)
+                                "gap" -> Gap(POLYLINE_STROKE_LENGTH)
+                                "dot" -> Dot()
+                                else -> null
+                            }
+                        })
+                    }
+                }
     }
 }

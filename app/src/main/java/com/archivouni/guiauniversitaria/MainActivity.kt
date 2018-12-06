@@ -14,8 +14,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewTreeObserver
-import android.widget.*
+import android.widget.Button
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -30,9 +32,6 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.squareup.picasso.Callback
-import com.squareup.picasso.Picasso
-import java.lang.Exception
 
 class MainActivity : AppCompatActivity(),
         OnMapReadyCallback,
@@ -67,8 +66,14 @@ class MainActivity : AppCompatActivity(),
         private const val IMAGE_HEIGHT = 500
         private const val IMAGE_FIT_TO_VIEW = false
 
-        private const val INFO_VIEW_PEEK_HEIGHT = 900
-        private const val LIST_VIEW_PEEK_HEIGHT = 600
+        private const val INFO_VIEW_PEEK_HEIGHT = 1000
+        private const val LIST_VIEW_PEEK_HEIGHT = 800
+
+        private enum class ShowcaseShape {
+            RECT,
+            CIRCLE,
+            NONE
+        }
     }
 
     //region Activity Variables
@@ -96,7 +101,6 @@ class MainActivity : AppCompatActivity(),
 
     private lateinit var mInfoView: View
     private lateinit var mInfoViewBehavior: BottomSheetBehavior<*>
-    private var mInfoViewHeight = 0
 
     private lateinit var mRecyclerView: RecyclerView
     private lateinit var mViewAdapter: RecyclerView.Adapter<*>
@@ -165,7 +169,7 @@ class MainActivity : AppCompatActivity(),
                 override fun onStateChanged(view: View, newState: Int) {
                     when (newState) {
                         BottomSheetBehavior.STATE_HIDDEN -> {
-                            mFocusedMarker?.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_icon))
+                            mFocusedMarker?.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_icon))
                         }
                     }
                 }
@@ -242,8 +246,10 @@ class MainActivity : AppCompatActivity(),
                         mMap.addMarker(MarkerOptions().position(poi.latLng)
                                 .title(poi.acronym)
                                 // https://www.flaticon.com/free-icon/placeholder_126470
-                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_icon)))
-                                .apply { tag = poi }
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_icon)))
+                                .apply {
+                                    tag = poi
+                                }
                     else
                         null
                 }.toTypedArray()
@@ -270,6 +276,7 @@ class MainActivity : AppCompatActivity(),
 
         /*****************MAP OPTIONS BEGIN**********************/
         //region Map Options
+        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.map_style))
         // Disable google maps toolbar
         mMap.uiSettings.isMapToolbarEnabled = false
         // Set bounds for camera
@@ -287,8 +294,8 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onMarkerClick(marker: Marker?): Boolean {
-        mFocusedMarker?.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_icon))
-        marker?.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_icon_focus))
+        mFocusedMarker?.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_icon))
+        marker?.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_icon_focus))
 
         val poi = marker?.tag as PointOfInterest
 
@@ -333,19 +340,6 @@ class MainActivity : AppCompatActivity(),
         mMap.setPadding(0,0,0, INFO_VIEW_PEEK_HEIGHT)
     }
 
-    fun setPaddingAfterLayout(view: View) {
-        view.apply {
-            viewTreeObserver.addOnGlobalLayoutListener(object: ViewTreeObserver.OnGlobalLayoutListener {
-                override fun onGlobalLayout() {
-                    this@apply.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                    mInfoViewHeight = minOf(this@apply.height, INFO_VIEW_PEEK_HEIGHT)
-//                    Log.d(TAG, "Padding: " + mInfoViewHeight.toString())
-                    mMap.setPadding(0,0,0,mInfoViewHeight)
-                }
-            })
-        }
-    }
-
     private fun getDirectionsUrl(origin: LatLng, dest: LatLng): String {
         val strOrigin = "origin=${origin.latitude},${origin.longitude}"
         val strDest = "destination=${dest.latitude},${dest.longitude}"
@@ -378,6 +372,15 @@ class MainActivity : AppCompatActivity(),
                 return
             }
 
+            if (pos == 1) {
+//                mShowcaseSequence.addSequenceItem(MaterialShowcaseView.Builder(this@MainActivity)
+//                        .setTarget(viewHolder.itemView)
+//                        .setDismissText("Terminar tutorial")
+//                        .setContentText("Presiona un punto de interes para ver su localizacion e informacion sobre el mismo.")
+//                        .withRectangleShape(false)
+//                        .build())
+            }
+
             val poi = mData[pos]?.tag as PointOfInterest
             // Bind data in list item
             Util.bindTextToView(poi.name, viewHolder.nameView)
@@ -386,11 +389,11 @@ class MainActivity : AppCompatActivity(),
             if (poi.latLng != null) {
                 viewHolder.itemView.setOnClickListener {
                     // Change color of focused marker back to normal
-                    mFocusedMarker?.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+                    mFocusedMarker?.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_icon))
                     // Update focused marker to clicked marker
                     mFocusedMarker = mData[pos]
                     // Change color of focused marker
-                    mFocusedMarker?.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+                    mFocusedMarker?.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_icon_focus))
 
                     // Bind data to info view
                     bindInfoToView(poi)

@@ -7,4 +7,9 @@
             android:src="@drawable/splash_logo" />
     </item>
 
+    <item android:bottom="8dp">
+        <bitmap android:gravity="bottom|center_horizontal"
+            android:src="@drawable/splash_subtitle" />
+    </item>
+
 </layer-list>

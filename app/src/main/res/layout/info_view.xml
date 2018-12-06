@@ -7,6 +7,7 @@
     android:layout_height="wrap_content"
     android:background="@color/colorBackground"
     android:orientation="vertical"
+    android:elevation="8dp"
     app:behavior_hideable="true"
     app:behavior_peekHeight="400dp"
     app:behavior_skipCollapsed="false"
@@ -36,7 +37,8 @@
             android:layout_height="80dp"
             android:layout_margin="4dp"
             android:layout_weight="1"
-            android:src="@drawable/ic_route_icon"/>
+            android:backgroundTint="@color/colorTransparent"
+            android:src="@drawable/route"/>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
