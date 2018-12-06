@@ -27,13 +27,12 @@ import kotlin.Exception
 
 
 // This object hold project-wide constants and methods
-object Util{
+object Util {
     private const val TAG = "Util"
 
     //region Project-wide Constants
     const val IMAGE_SERVER_URL = "http://ec2-18-220-11-214.us-east-2.compute.amazonaws.com/"
     const val GOOGLE_API_URL = "https://maps.googleapis.com/maps/api/directions/"
-    // const val MAP_TILES_DIRECTORY = "map_tiles_bmp"
 
     const val LOCATION_REQUEST_INTERVAL = 10L
     const val LOCATION_REQUEST_FASTEST_INTERVAL = 5L
@@ -113,8 +112,6 @@ object Util{
 
     object DirectionsJSONParser {
         private const val TAG_ROUTES = "routes"
-        private const val TAG_LEGS = "legs"
-        private const val TAG_STEPS = "steps"
         private const val TAG_OVERVIEW_POLYLINE = "overview_polyline"
         private const val TAG_POINTS="points"
 
@@ -124,7 +121,7 @@ object Util{
             try {
                 jRoutes = jObject.getJSONArray(TAG_ROUTES)
                 if (jRoutes.length() > 0) {
-                    val overviewPolyline = (jRoutes.get(0) as JSONObject).getJSONObject(TAG_OVERVIEW_POLYLINE)
+                    val overviewPolyline = (jRoutes[0] as JSONObject).getJSONObject(TAG_OVERVIEW_POLYLINE)
                     val encodedPoints = overviewPolyline.getString(TAG_POINTS)
                     return PolyUtil.decode(encodedPoints)
                 } else {

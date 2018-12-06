@@ -19,6 +19,7 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -32,6 +33,8 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import java.lang.Exception
+import java.util.ArrayList
 
 class MainActivity : AppCompatActivity(),
         OnMapReadyCallback,
@@ -113,6 +116,9 @@ class MainActivity : AppCompatActivity(),
     private lateinit var mData: Array<Marker?>
 
     private var mFocusedMarker: Marker? = null
+
+    private var autoComplete: HashMap<Pair<Int, String>,Marker> = HashMap()
+    var displayList: MutableList<String> = ArrayList()
     //endregion
 
     //region Public functions
@@ -149,6 +155,11 @@ class MainActivity : AppCompatActivity(),
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         /*****************LIST VIEW BEGINS**********************/
+        //preloads data for the searchBar
+        /***************************************************************************************************/
+
+        /*****************BOTTOM_SHEET BEGINS**********************/
+        //region POI List View
         mListView = findViewById(R.id.list_view)
         mListViewBehavior = BottomSheetBehavior.from(mListView).apply {
             state = BottomSheetBehavior.STATE_HIDDEN
@@ -162,7 +173,7 @@ class MainActivity : AppCompatActivity(),
             peekHeight = INFO_VIEW_PEEK_HEIGHT
             setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
                 override fun onSlide(view: View, slideOffset: Float) {
-                    mMap.setPadding(0,0,0,0)
+                    mMap.setPadding(0, 0, 0, 0)
                 }
 
                 @SuppressLint("SwitchIntDef")
@@ -240,8 +251,7 @@ class MainActivity : AppCompatActivity(),
                 .bufferedReader().use { br ->
                     br.readText()
                 })
-                .data
-                .map { poi ->
+                .data.map { poi ->
                     if (poi.latLng != null)
                         mMap.addMarker(MarkerOptions().position(poi.latLng)
                                 .title(poi.acronym)
@@ -262,13 +272,42 @@ class MainActivity : AppCompatActivity(),
          * initialized in order to bind list items to their position on the map.
          */
         mViewManager = LinearLayoutManager(this)
-        mViewAdapter = ListAdapter()
+        mViewAdapter = ListAdapter(mData)
         mRecyclerView = findViewById<RecyclerView>(R.id.recycler_view).apply {
             // Recycler view options
             setHasFixedSize(true)
             layoutManager = mViewManager
             adapter = mViewAdapter
         }
+
+        preloadAutocomplete()
+        val searchBar: SearchView = findViewById(R.id.search_bar)
+        // TODO: Implement search logic here
+        searchBar.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                if (newText!!.isNotEmpty()) {
+                    //newRecycler = mRecyclerView
+                    val query = newText.toLowerCase()
+                    val filteredData = MutableList<Marker?>(0) { null }
+                    autoComplete.forEach {(key, value) ->
+                        if (key.second.toLowerCase().contains(query)) {
+                                filteredData.add(value)
+                        }
+                    }
+                    mViewAdapter = ListAdapter(filteredData.toTypedArray())
+                    mRecyclerView.adapter = mViewAdapter
+                } else {
+                    println("Didn't find the element")
+                }
+                return true
+            }
+        })
+
 
         /*****************MY_LOCATION LOGIC BEGINS**********************/
         enableMyLocation()
@@ -301,13 +340,13 @@ class MainActivity : AppCompatActivity(),
 
         if (mCanGetLocation) {
             if (mLastKnownLatLng != null)
-                mInfoRouteButton.setOnClickListener {button ->
+                mInfoRouteButton.setOnClickListener { button ->
                     bindRouteToButton(button as ImageButton, mLastKnownLatLng!!, poi.latLng!!)
                 }
         }
         bindInfoToView(marker.tag as PointOfInterest)
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(poi.latLng, FOCUS_ZOOM))
-        mMap.setPadding(0,0,0,0)
+        mMap.setPadding(0, 0, 0, 0)
 
         mListViewBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         mInfoViewBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
@@ -337,7 +376,7 @@ class MainActivity : AppCompatActivity(),
         Util.bindTextToView(poi.description, findViewById(R.id.info_description))
         if (mCanGetLocation)
             bindRouteToButton(mInfoRouteButton, mLastKnownLatLng!!, poi.latLng!!)
-        mMap.setPadding(0,0,0, INFO_VIEW_PEEK_HEIGHT)
+        mMap.setPadding(0, 0, 0, INFO_VIEW_PEEK_HEIGHT)
     }
 
     private fun getDirectionsUrl(origin: LatLng, dest: LatLng): String {
@@ -353,10 +392,16 @@ class MainActivity : AppCompatActivity(),
                         .getString("com.google.android.geo.API_KEY")
     }
 
-    inner class ListAdapter: RecyclerView.Adapter<POIViewHolder>() {
+    inner class ListAdapter(val data: Array<Marker?>) : RecyclerView.Adapter<ListAdapter.POIViewHolder>() {
+        // Class defining list item view holder defined in list_item_layout.xml
+        inner class POIViewHolder(poiView: View): RecyclerView.ViewHolder(poiView) {
+            var nameView = poiView.findViewById<TextView?>(R.id.poi_name)
+            var acronymView = poiView.findViewById<TextView?>(R.id.poi_acronym)
+        }
+
         // Number of items in dataset
         override fun getItemCount(): Int {
-            return mData.size
+            return data.size
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): POIViewHolder {
@@ -367,21 +412,12 @@ class MainActivity : AppCompatActivity(),
 
         // Binds data to view when it becomes available
         override fun onBindViewHolder(viewHolder: POIViewHolder, pos: Int) {
-            if (mData[pos] == null) {
+            if (data[pos] == null) {
                 Log.e("ListAdapter", "Marker at index $pos is null")
                 return
             }
 
-            if (pos == 1) {
-//                mShowcaseSequence.addSequenceItem(MaterialShowcaseView.Builder(this@MainActivity)
-//                        .setTarget(viewHolder.itemView)
-//                        .setDismissText("Terminar tutorial")
-//                        .setContentText("Presiona un punto de interes para ver su localizacion e informacion sobre el mismo.")
-//                        .withRectangleShape(false)
-//                        .build())
-            }
-
-            val poi = mData[pos]?.tag as PointOfInterest
+            val poi = data[pos]?.tag as PointOfInterest
             // Bind data in list item
             Util.bindTextToView(poi.name, viewHolder.nameView)
             Util.bindTextToView(poi.acronym, viewHolder.acronymView)
@@ -391,14 +427,14 @@ class MainActivity : AppCompatActivity(),
                     // Change color of focused marker back to normal
                     mFocusedMarker?.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_icon))
                     // Update focused marker to clicked marker
-                    mFocusedMarker = mData[pos]
+                    mFocusedMarker = data[pos]
                     // Change color of focused marker
                     mFocusedMarker?.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_icon_focus))
 
                     // Bind data to info view
                     bindInfoToView(poi)
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(poi.latLng, MainActivity.FOCUS_ZOOM))
-                    mMap.setPadding(0,0,0,0)
+                    mMap.setPadding(0, 0, 0, 0)
 
                     // Hide list view and show info view
                     mListViewBehavior.state = BottomSheetBehavior.STATE_HIDDEN
@@ -568,10 +604,14 @@ class MainActivity : AppCompatActivity(),
         }
     }
     //endregion
-}
 
-// Class defining list item view holder defined in list_item_layout.xml
-class POIViewHolder(poiView: View): RecyclerView.ViewHolder(poiView) {
-    var nameView = poiView.findViewById<TextView?>(R.id.poi_name)
-    var acronymView = poiView.findViewById<TextView?>(R.id.poi_acronym)
+    private fun preloadAutocomplete() {
+        mData.forEach {
+            val poi = it?.tag as PointOfInterest
+            if (poi.name != null)
+                autoComplete[Pair(poi.id, poi.name)] = it
+            if (poi.acronym != null)
+                autoComplete[Pair(poi.id, poi.acronym)] = it
+        }
+    }
 }
