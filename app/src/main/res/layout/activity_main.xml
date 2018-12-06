@@ -29,6 +29,16 @@
         android:src="@drawable/ic_settings"
         android:background="@color/colorTransparent" />
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/button_close_route"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:layout_gravity="top|end"
+        android:background="@color/colorTransparent"
+        android:visibility="gone"
+        android:text="Cerrar\nRuta"/>
+
     <include
         android:id="@+id/include"
         layout="@layout/activity_maps" />

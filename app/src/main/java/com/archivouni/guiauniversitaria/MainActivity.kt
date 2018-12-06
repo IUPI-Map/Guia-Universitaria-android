@@ -111,6 +111,7 @@ class MainActivity : AppCompatActivity(),
     private lateinit var mViewManager: RecyclerView.LayoutManager
 
     private lateinit var mSettingsButton: ImageButton
+    private lateinit var mCloseRouteButton: Button
 
     private lateinit var mInfoRouteButton: ImageButton
 
@@ -129,7 +130,9 @@ class MainActivity : AppCompatActivity(),
             Util.currentRoutes.forEach { polyline ->
                 polyline?.remove()
             }
+            Util.currentRoutes.clear()
             Util.DownloadTask(mMap).execute(url)
+            mCloseRouteButton.visibility = View.VISIBLE
         }
     }
     //endregion
@@ -185,9 +188,16 @@ class MainActivity : AppCompatActivity(),
             })
         }
 
+        mCloseRouteButton = findViewById(R.id.button_close_route)
+        mCloseRouteButton.setOnClickListener {
+            Util.currentRoutes.forEach { polyline ->
+                polyline?.remove()
+            }
+            Util.currentRoutes.clear()
+            mCloseRouteButton.visibility = View.GONE
+        }
         mInfoRouteButton = findViewById(R.id.info_route_button)
 
-        /*****************SEARCH_BUTTON BEGINS**********************/
         mListViewButton = findViewById(R.id.button_open_list)
         mListViewButton.setOnClickListener {
             // Open list view on click
