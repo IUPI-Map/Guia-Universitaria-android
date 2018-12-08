@@ -5,6 +5,7 @@
     <string name="permission_rationale_location">Requesting permission to get location</string>
     <string name="permission_required_toast">TOAST</string>
     <string name="location_permission_denied">location denied</string>
+    <string name="calculating_route_toast">Calculating route . . .</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="details">¡Bienvenidos!\n

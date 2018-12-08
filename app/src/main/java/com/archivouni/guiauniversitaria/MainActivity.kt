@@ -15,10 +15,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
@@ -72,12 +69,6 @@ class MainActivity : AppCompatActivity(),
 
         private const val INFO_VIEW_PEEK_HEIGHT = 1000
         private const val LIST_VIEW_PEEK_HEIGHT = 800
-
-        private enum class ShowcaseShape {
-            RECT,
-            CIRCLE,
-            NONE
-        }
     }
 
     //region Activity Variables
@@ -127,6 +118,7 @@ class MainActivity : AppCompatActivity(),
     fun bindRouteToButton(view: ImageButton, origin: LatLng, dest: LatLng) {
         val url = getDirectionsUrl(origin, dest)
         view.setOnClickListener {
+            Toast.makeText(this, R.string.calculating_route_toast, Toast.LENGTH_SHORT).show()
             Util.currentRoutes.forEach { polyline ->
                 polyline?.remove()
             }
@@ -195,6 +187,7 @@ class MainActivity : AppCompatActivity(),
                 polyline?.remove()
             }
             Util.currentRoutes.clear()
+            mFocusedMarker?.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_icon))
             mCloseRouteButton.visibility = View.GONE
         }
         mInfoRouteButton = findViewById(R.id.info_route_button)
@@ -394,8 +387,9 @@ class MainActivity : AppCompatActivity(),
         Util.bindTextToView(poi.name, findViewById(R.id.info_name))
 //        bindTextToView(poi.acronym, view.findViewById(R.id.info_acronym))
         Util.bindTextToView(poi.description, findViewById(R.id.info_description))
-        if (mCanGetLocation)
+        if (mCanGetLocation) {
             bindRouteToButton(mInfoRouteButton, mLastKnownLatLng!!, poi.latLng!!)
+        }
         mMap.setPadding(0, 0, 0, INFO_VIEW_PEEK_HEIGHT)
     }
 

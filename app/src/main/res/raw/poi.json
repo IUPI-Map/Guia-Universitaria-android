@@ -5,8 +5,8 @@
         "LONGITUDE": -66.050292, 
         "LATITUDE": 18.401662, 
         "IMAGES": [
-            "images/001-agustin-stahl/001-n-agustin-stahl-01.jpg", 
-            "images/001-agustin-stahl/001-p-agustin-stahl-01.jpg"
+            "001-agustin-stahl/001-n-agustin-stahl-01.jpg", 
+            "001-agustin-stahl/001-p-agustin-stahl-01.jpg"
         ], 
         "_id": 1, 
         "TYPE": "building", 
@@ -18,8 +18,8 @@
         "LONGITUDE": -66.0488, 
         "LATITUDE": 18.406033, 
         "IMAGES": [
-            "images/002-ana-maria-oneill/002-n-ana-maria-oneill-01.jpg", 
-            "images/002-ana-maria-oneill/002-p-ana-maria-oneill-01.jpg"
+            "002-ana-maria-oneill/002-n-ana-maria-oneill-01.jpg", 
+            "002-ana-maria-oneill/002-p-ana-maria-oneill-01.jpg"
         ], 
         "_id": 2, 
         "TYPE": "building", 
@@ -31,8 +31,8 @@
         "LONGITUDE": -66.050596, 
         "LATITUDE": 18.401741, 
         "IMAGES": [
-            "images/003-anexo-facundo-bueso/003-n-anexo-facundo-bueso-01.jpg", 
-            "images/003-anexo-facundo-bueso/003-p-anexo-facundo-bueso-01.jpg"
+            "003-anexo-facundo-bueso/003-n-anexo-facundo-bueso-01.jpg", 
+            "003-anexo-facundo-bueso/003-p-anexo-facundo-bueso-01.jpg"
         ], 
         "_id": 3, 
         "TYPE": "building", 
@@ -44,8 +44,8 @@
         "LONGITUDE": -66.049266, 
         "LATITUDE": 18.40196, 
         "IMAGES": [
-            "images/004-anfiteatro-julia-de-burgos/004-n-anfiteatro-julia-de-burgos-01.jpg", 
-            "images/004-anfiteatro-julia-de-burgos/004-p-anfiteatro-julia-de-burgos-01.jpg"
+            "004-anfiteatro-julia-de-burgos/004-n-anfiteatro-julia-de-burgos-01.jpg", 
+            "004-anfiteatro-julia-de-burgos/004-p-anfiteatro-julia-de-burgos-01.jpg"
         ], 
         "_id": 4, 
         "TYPE": "building", 
@@ -57,7 +57,7 @@
         "LONGITUDE": -66.046755, 
         "LATITUDE": 18.403381, 
         "IMAGES": [
-            "images/005-antigua-escuela-de-arquitectura/005-n-antigua-escuela-de-arquitectura-01.jpg"
+            "005-antigua-escuela-de-arquitectura/005-n-antigua-escuela-de-arquitectura-01.jpg"
         ], 
         "_id": 5, 
         "TYPE": "building", 
@@ -69,9 +69,9 @@
         "LONGITUDE": -66.050233, 
         "LATITUDE": 18.402339, 
         "IMAGES": [
-            "images/006-antonio-s-pedreira/006-n-antonio-s-pedreira-01.jpg", 
-            "images/006-antonio-s-pedreira/006-n-antonio-s-pedreira-02.jpg", 
-            "images/006-antonio-s-pedreira/006-p-antonio-s-pedreira-01.jpg"
+            "006-antonio-s-pedreira/006-n-antonio-s-pedreira-01.jpg", 
+            "006-antonio-s-pedreira/006-n-antonio-s-pedreira-02.jpg", 
+            "006-antonio-s-pedreira/006-p-antonio-s-pedreira-01.jpg"
         ], 
         "_id": 6, 
         "TYPE": "building", 
@@ -83,8 +83,8 @@
         "LONGITUDE": -66.048306,
         "LATITUDE": 18.4030001,
         "IMAGES": [
-            "images/007-archivo-central/007-n-archivo-central-01.jpg", 
-            "images/007-archivo-central/007-n-archivo-central-02.jpg"
+            "007-archivo-central/007-n-archivo-central-01.jpg", 
+            "007-archivo-central/007-n-archivo-central-02.jpg"
         ], 
         "_id": 7, 
         "TYPE": "building", 
@@ -96,8 +96,8 @@
         "LONGITUDE": -66.049091, 
         "LATITUDE": 18.406762, 
         "IMAGES": [
-            "images/008-beatriz-lasalle/008-n-beatriz-lasalle-01.jpg", 
-            "images/008-beatriz-lasalle/008-p-beatriz-lasalle-01.jpg"
+            "008-beatriz-lasalle/008-n-beatriz-lasalle-01.jpg", 
+            "008-beatriz-lasalle/008-p-beatriz-lasalle-01.jpg"
         ], 
         "_id": 8, 
         "TYPE": "building", 
@@ -109,8 +109,8 @@
         "LONGITUDE": -66.046, 
         "LATITUDE": 18.402334, 
         "IMAGES": [
-            "images/009-bellas-artes/009-n-bellas-artes-01.jpg", 
-            "images/009-bellas-artes/009-p-bellas-artes-01.jpg"
+            "009-bellas-artes/009-n-bellas-artes-01.jpg", 
+            "009-bellas-artes/009-p-bellas-artes-01.jpg"
         ], 
         "_id": 9, 
         "TYPE": "building", 
@@ -122,8 +122,8 @@
         "LONGITUDE": -66.049814, 
         "LATITUDE": 18.404221, 
         "IMAGES": [
-            "images/010-biblioteca-jose-m-lazaro/010-n-biblioteca-jose-m-lazaro-01.jpg", 
-            "images/010-biblioteca-jose-m-lazaro/010-p-biblioteca-jose-m-lazaro-01.jpg"
+            "010-biblioteca-jose-m-lazaro/010-n-biblioteca-jose-m-lazaro-01.jpg", 
+            "010-biblioteca-jose-m-lazaro/010-p-biblioteca-jose-m-lazaro-01.jpg"
         ], 
         "_id": 10, 
         "TYPE": "building", 
@@ -135,9 +135,9 @@
         "LONGITUDE": -66.047784, 
         "LATITUDE": 18.401817, 
         "IMAGES": [
-            "images/011-carlota-matienzo/011-a-carlota-matienzo-01.jpg", 
-            "images/011-carlota-matienzo/011-n-carlota-matienzo-01.jpg", 
-            "images/011-carlota-matienzo/011-p-carlota-matienzo-01.jpg"
+            "011-carlota-matienzo/011-a-carlota-matienzo-01.jpg", 
+            "011-carlota-matienzo/011-n-carlota-matienzo-01.jpg", 
+            "011-carlota-matienzo/011-p-carlota-matienzo-01.jpg"
         ], 
         "_id": 11, 
         "TYPE": "building", 
@@ -149,8 +149,8 @@
         "LONGITUDE": -66.049513, 
         "LATITUDE": 18.406536, 
         "IMAGES": [
-            "images/012-carmen-rivera-de-alvarado/012-n-carmen-rivera-de-alvarado-01.jpg", 
-            "images/012-carmen-rivera-de-alvarado/012-p-carmen-rivera-de-alvarado-01.jpg"
+            "012-carmen-rivera-de-alvarado/012-n-carmen-rivera-de-alvarado-01.jpg", 
+            "012-carmen-rivera-de-alvarado/012-p-carmen-rivera-de-alvarado-01.jpg"
         ], 
         "_id": 12, 
         "TYPE": "building", 
@@ -162,8 +162,8 @@
         "LONGITUDE": -66.04854, 
         "LATITUDE": 18.404288, 
         "IMAGES": [
-            "images/013-casa-del-canciller/013-n-casa-del-canciller-01.jpg", 
-            "images/013-casa-del-canciller/013-n-casa-del-canciller-02.jpg"
+            "013-casa-del-canciller/013-n-casa-del-canciller-01.jpg", 
+            "013-casa-del-canciller/013-n-casa-del-canciller-02.jpg"
         ], 
         "_id": 13, 
         "TYPE": "building", 
@@ -175,7 +175,7 @@
         "LONGITUDE": -66.049266, 
         "LATITUDE": 18.40196, 
         "IMAGES": [
-            "images/014-casa-lima/014-n-casa-lima-01.jpg"
+            "014-casa-lima/014-n-casa-lima-01.jpg"
         ], 
         "_id": 14, 
         "TYPE": "building", 
@@ -187,7 +187,7 @@
         "LONGITUDE": -66.053099, 
         "LATITUDE": 18.404706, 
         "IMAGES": [
-            "images/015-casa-margarida/015-n-casa-margarida-01.jpg"
+            "015-casa-margarida/015-n-casa-margarida-01.jpg"
         ], 
         "_id": 15, 
         "TYPE": "building", 
@@ -199,8 +199,8 @@
         "LONGITUDE": -66.052887, 
         "LATITUDE": 18.405298, 
         "IMAGES": [
-            "images/016-centro-de-desarrollo-preescolar/016-n-centro-de-desarrollo-preescolar-01.jpg", 
-            "images/016-centro-de-desarrollo-preescolar/016-n-centro-de-desarrollo-preescolar-02.jpg"
+            "016-centro-de-desarrollo-preescolar/016-n-centro-de-desarrollo-preescolar-01.jpg", 
+            "016-centro-de-desarrollo-preescolar/016-n-centro-de-desarrollo-preescolar-02.jpg"
         ], 
         "_id": 16, 
         "TYPE": "building", 
@@ -212,7 +212,7 @@
         "LONGITUDE": -66.047509, 
         "LATITUDE": 18.404388, 
         "IMAGES": [
-            "images/017-centro-universitario/017-n-centro-universitario-01.jpg"
+            "017-centro-universitario/017-n-centro-universitario-01.jpg"
         ], 
         "_id": 17, 
         "TYPE": "building", 
@@ -224,7 +224,7 @@
         "LONGITUDE": -66.045512, 
         "LATITUDE": 18.404454, 
         "IMAGES": [
-            "images/018-ciencias-naturales-i/018-n-ciencias-naturales-i-01.jpg"
+            "018-ciencias-naturales-i/018-n-ciencias-naturales-i-01.jpg"
         ], 
         "_id": 18, 
         "TYPE": "building", 
@@ -236,7 +236,7 @@
         "LONGITUDE": -66.046282, 
         "LATITUDE": 18.404036, 
         "IMAGES": [
-            "images/019-ciencias-naturales-ii/019-n-ciencias-naturales-ii-01.jpg"
+            "019-ciencias-naturales-ii/019-n-ciencias-naturales-ii-01.jpg"
         ], 
         "_id": 19, 
         "TYPE": "building", 
@@ -248,8 +248,8 @@
         "LONGITUDE": -66.046622,
         "LATITUDE": 18.406951,
         "IMAGES": [ 
-            "images/020-complejo-deportivo-cosme-beitia-salamo/020-n-complejo-deportivo-cosme-beitia-salamo-01.jpg", 
-            "images/020-complejo-deportivo-cosme-beitia-salamo/020-p-complejo-deportivo-cosme-beitia-salamo-01.jpg"
+            "020-complejo-deportivo-cosme-beitia-salamo/020-n-complejo-deportivo-cosme-beitia-salamo-01.jpg", 
+            "020-complejo-deportivo-cosme-beitia-salamo/020-p-complejo-deportivo-cosme-beitia-salamo-01.jpg"
         ], 
         "_id": 20, 
         "TYPE": "building", 
@@ -261,8 +261,8 @@
         "LONGITUDE": -66.049438, 
         "LATITUDE": 18.40266, 
         "IMAGES": [
-            "images/021-cuadrangulo-historico/021-a-cuadrangulo-historico-01.jpg", 
-            "images/021-cuadrangulo-historico/021-n-cuadrangulo-historico-01.jpg"
+            "021-cuadrangulo-historico/021-a-cuadrangulo-historico-01.jpg", 
+            "021-cuadrangulo-historico/021-n-cuadrangulo-historico-01.jpg"
         ], 
         "_id": 21, 
         "TYPE": "building", 
@@ -274,8 +274,8 @@
         "LONGITUDE": -66.049362, 
         "LATITUDE": 18.40337, 
         "IMAGES": [
-            "images/022-cuadrangulo-historico-norte/022-n-cuadrangulo-historico-norte-01.jpg", 
-            "images/022-cuadrangulo-historico-norte/022-n-cuadrangulo-historico-norte-02.jpg"
+            "022-cuadrangulo-historico-norte/022-n-cuadrangulo-historico-norte-01.jpg", 
+            "022-cuadrangulo-historico-norte/022-n-cuadrangulo-historico-norte-02.jpg"
         ], 
         "_id": 22, 
         "TYPE": "building", 
@@ -287,7 +287,7 @@
         "LONGITUDE": -66.044729, 
         "LATITUDE": 18.405305, 
         "IMAGES": [
-            "images/023-division-de-seguridad-y-manejo-de-riesgos/023-n-division-de-seguridad-y-manejo-de-riesgos-01.jpg"
+            "023-division-de-seguridad-y-manejo-de-riesgos/023-n-division-de-seguridad-y-manejo-de-riesgos-01.jpg"
         ], 
         "_id": 23, 
         "TYPE": "building", 
@@ -299,8 +299,8 @@
         "LONGITUDE": -66.046858, 
         "LATITUDE": 18.404076, 
         "IMAGES": [
-            "images/024-division-de-tecnologias-academicas-y-administrativas/024-a-division-de-tecnologias-academicas-y-administrativas-01.jpg", 
-            "images/024-division-de-tecnologias-academicas-y-administrativas/024-n-division-de-tecnologias-academicas-y-administrativas-01.jpg"
+            "024-division-de-tecnologias-academicas-y-administrativas/024-a-division-de-tecnologias-academicas-y-administrativas-01.jpg", 
+            "024-division-de-tecnologias-academicas-y-administrativas/024-n-division-de-tecnologias-academicas-y-administrativas-01.jpg"
         ], 
         "_id": 24, 
         "TYPE": "building", 
@@ -312,8 +312,8 @@
         "LONGITUDE": -66.046022, 
         "LATITUDE": 18.405791, 
         "IMAGES": [
-            "images/025-domingo-marrero-navarro/025-n-domingo-marrero-navarro-01.jpg", 
-            "images/025-domingo-marrero-navarro/025-p-domingo-marrero-navarro-01.jpg"
+            "025-domingo-marrero-navarro/025-n-domingo-marrero-navarro-01.jpg", 
+            "025-domingo-marrero-navarro/025-p-domingo-marrero-navarro-01.jpg"
         ], 
         "_id": 25, 
         "TYPE": "building", 
@@ -325,9 +325,9 @@
         "LONGITUDE": -66.048915, 
         "LATITUDE": 18.403357, 
         "IMAGES": [
-            "images/026-edificio-hostos/026-a-edificio-hostos-01.jpg", 
-            "images/026-edificio-hostos/026-n-edificio-hostos-01.jpg", 
-            "images/026-edificio-hostos/026-p-edificio-hostos-01.jpg"
+            "026-edificio-hostos/026-a-edificio-hostos-01.jpg", 
+            "026-edificio-hostos/026-n-edificio-hostos-01.jpg", 
+            "026-edificio-hostos/026-p-edificio-hostos-01.jpg"
         ], 
         "_id": 26, 
         "TYPE": "building", 
@@ -339,8 +339,8 @@
         "LONGITUDE": -66.053693, 
         "LATITUDE": 18.402925, 
         "IMAGES": [
-            "images/027-edificio-puerto-rico/027-n-edificio-puerto-rico-01.jpg", 
-            "images/027-edificio-puerto-rico/027-n-edificio-puerto-rico-01.png"
+            "027-edificio-puerto-rico/027-n-edificio-puerto-rico-01.jpg", 
+            "027-edificio-puerto-rico/027-n-edificio-puerto-rico-01.png"
         ], 
         "_id": 27, 
         "TYPE": "building", 
@@ -352,7 +352,7 @@
         "LONGITUDE": -66.054123, 
         "LATITUDE": 18.403144, 
         "IMAGES": [
-            "images/028-edificio-rivera/028-n-edificio-rivera-01.jpg"
+            "028-edificio-rivera/028-n-edificio-rivera-01.jpg"
         ], 
         "_id": 28, 
         "TYPE": "building", 
@@ -387,7 +387,7 @@
         "LONGITUDE": -66.046069, 
         "LATITUDE": 18.403143, 
         "IMAGES": [
-            "images/031-escuela-de-arquitectura/031-n-escuela-de-arquitectura-01.jpg"
+            "031-escuela-de-arquitectura/031-n-escuela-de-arquitectura-01.jpg"
         ], 
         "_id": 31, 
         "TYPE": "building", 
@@ -399,7 +399,7 @@
         "LONGITUDE": -66.052302, 
         "LATITUDE": 18.404537, 
         "IMAGES": [
-            "images/032-escuela-de-comunicacion/032-n-escuela-de-comunicacion-01.jpg"
+            "032-escuela-de-comunicacion/032-n-escuela-de-comunicacion-01.jpg"
         ], 
         "_id": 32, 
         "TYPE": "building", 
@@ -411,8 +411,8 @@
         "LONGITUDE": -66.047704, 
         "LATITUDE": 18.406979, 
         "IMAGES": [
-            "images/033-escuela-de-derecho/033-n-escuela-de-derecho-01.jpg", 
-            "images/033-escuela-de-derecho/033-n-escuela-de-derecho-02.jpg"
+            "033-escuela-de-derecho/033-n-escuela-de-derecho-01.jpg", 
+            "033-escuela-de-derecho/033-n-escuela-de-derecho-02.jpg"
         ], 
         "_id": 33, 
         "TYPE": "building", 
@@ -424,7 +424,7 @@
         "LONGITUDE": -66.049062, 
         "LATITUDE": 18.400371, 
         "IMAGES": [
-            "images/029-edificio-turabo/029-n-edificio-turabo-01.jpg"
+            "029-edificio-turabo/029-n-edificio-turabo-01.jpg"
         ], 
         "_id": 34, 
         "TYPE": "building", 
@@ -436,8 +436,8 @@
         "LONGITUDE": -66.04716, 
         "LATITUDE": 18.401897, 
         "IMAGES": [
-            "images/035-escuela-maternal/035-n-escuela-maternal-01.jpg", 
-            "images/035-escuela-maternal/035-n-escuela-maternal-02.jpg"
+            "035-escuela-maternal/035-n-escuela-maternal-01.jpg", 
+            "035-escuela-maternal/035-n-escuela-maternal-02.jpg"
         ], 
         "_id": 35, 
         "TYPE": "building", 
@@ -449,7 +449,7 @@
         "LONGITUDE": -66.050146, 
         "LATITUDE": 18.400694, 
         "IMAGES": [
-            "images/036-escuela-superior/036-n-escuela-superior-01.jpg"
+            "036-escuela-superior/036-n-escuela-superior-01.jpg"
         ], 
         "_id": 36, 
         "TYPE": "building", 
@@ -461,7 +461,7 @@
         "LONGITUDE": -66.048125, 
         "LATITUDE": 18.40222, 
         "IMAGES": [
-            "images/037-facultad-de-educacion-eugenio-maria-de-hostos/037-n-facultad-de-educacion-eugenio-maria-de-hostos-01.jpg"
+            "037-facultad-de-educacion-eugenio-maria-de-hostos/037-n-facultad-de-educacion-eugenio-maria-de-hostos-01.jpg"
         ], 
         "_id": 37, 
         "TYPE": "building", 
@@ -473,10 +473,10 @@
         "LONGITUDE": -66.051437, 
         "LATITUDE": 18.4018, 
         "IMAGES": [
-            "images/038-facundo-bueso/038-n-facundo-bueso-01.jpg", 
-            "images/038-facundo-bueso/038-a-facundo-bueso-01.jpg", 
-            "images/038-facundo-bueso/038-a-facundo-bueso-01.png", 
-            "images/038-facundo-bueso/038-p-facundo-bueso-01.jpg"
+            "038-facundo-bueso/038-n-facundo-bueso-01.jpg", 
+            "038-facundo-bueso/038-a-facundo-bueso-01.jpg", 
+            "038-facundo-bueso/038-a-facundo-bueso-01.png", 
+            "038-facundo-bueso/038-p-facundo-bueso-01.jpg"
         ], 
         "_id": 38, 
         "TYPE": "building", 
@@ -488,9 +488,9 @@
         "LONGITUDE": -66.050147, 
         "LATITUDE": 18.403386, 
         "IMAGES": [
-            "images/039-felipe-janer/039-n-felipe-janer-01.jpg", 
-            "images/039-felipe-janer/039-a-felipe-janer-01.jpg", 
-            "images/039-felipe-janer/039-p-felipe-janer-01.jpg"
+            "039-felipe-janer/039-n-felipe-janer-01.jpg", 
+            "039-felipe-janer/039-a-felipe-janer-01.jpg", 
+            "039-felipe-janer/039-p-felipe-janer-01.jpg"
         ], 
         "_id": 39, 
         "TYPE": "building", 
@@ -502,8 +502,8 @@
         "LONGITUDE": -66.048661, 
         "LATITUDE": 18.403388, 
         "IMAGES": [
-            "images/040-glorieta-fabian/040-n-glorieta-fabian-01.jpg", 
-            "images/040-glorieta-fabian/040-a-glorieta-fabian-01.png"
+            "040-glorieta-fabian/040-n-glorieta-fabian-01.jpg", 
+            "040-glorieta-fabian/040-a-glorieta-fabian-01.png"
         ], 
         "_id": 40, 
         "TYPE": "building", 
@@ -515,7 +515,7 @@
         "LONGITUDE": -66.048745, 
         "LATITUDE": 18.402094, 
         "IMAGES": [
-            "images/041-glorieta-veve/041-p-glorieta-veve-01.jpeg"
+            "041-glorieta-veve/041-p-glorieta-veve-01.jpeg"
         ], 
         "_id": 41, 
         "TYPE": "building", 
@@ -527,7 +527,7 @@
         "LONGITUDE": -66.051481, 
         "LATITUDE": 18.405109, 
         "IMAGES": [
-            "images/042-hogar-masonico/042-n-hogar-masonico-01.jpg"
+            "042-hogar-masonico/042-n-hogar-masonico-01.jpg"
         ], 
         "_id": 42, 
         "TYPE": "building", 
@@ -539,7 +539,7 @@
         "LONGITUDE": -66.046871, 
         "LATITUDE": 18.40909, 
         "IMAGES": [
-            "images/043-instalaciones-deportivas/043-n-instalaciones-deportivas-01.jpg"
+            "043-instalaciones-deportivas/043-n-instalaciones-deportivas-01.jpg"
         ], 
         "_id": 43, 
         "TYPE": "building", 
@@ -551,8 +551,8 @@
         "LONGITUDE": -66.045036, 
         "LATITUDE": 18.4056, 
         "IMAGES": [
-            "images/044-jaime-benitez-rexach/044-n-jaime-benitez-rexach-01.jpg", 
-            "images/044-jaime-benitez-rexach/044-n-jaime-benitez-rexach-02.jpg"
+            "044-jaime-benitez-rexach/044-n-jaime-benitez-rexach-01.jpg", 
+            "044-jaime-benitez-rexach/044-n-jaime-benitez-rexach-02.jpg"
         ], 
         "_id": 44, 
         "TYPE": "building", 
@@ -564,11 +564,11 @@
         "LONGITUDE": -66.048364, 
         "LATITUDE": 18.405774, 
         "IMAGES": [
-            "images/045-juan-jose-osuna/045-n-juan-jose-osuna-01.jpg", 
-            "images/045-juan-jose-osuna/045-n-juan-jose-osuna-02.jpg", 
-            "images/045-juan-jose-osuna/045-n-juan-jose-osuna-03.jpg", 
-            "images/045-juan-jose-osuna/045-a-juan-jose-osuna-01.jpg", 
-            "images/045-juan-jose-osuna/045-p-juan-jose-osuna-01.jpg"
+            "045-juan-jose-osuna/045-n-juan-jose-osuna-01.jpg", 
+            "045-juan-jose-osuna/045-n-juan-jose-osuna-02.jpg", 
+            "045-juan-jose-osuna/045-n-juan-jose-osuna-03.jpg", 
+            "045-juan-jose-osuna/045-a-juan-jose-osuna-01.jpg", 
+            "045-juan-jose-osuna/045-p-juan-jose-osuna-01.jpg"
         ], 
         "_id": 45, 
         "TYPE": "building", 
@@ -580,8 +580,8 @@
         "LONGITUDE": -66.049522, 
         "LATITUDE": 18.401587, 
         "IMAGES": [
-            "images/046-julio-garcia-diaz/046-n-julio-garcia-diaz-01.jpg", 
-            "images/046-julio-garcia-diaz/046-p-julio-garcia-diaz-01.jpg"
+            "046-julio-garcia-diaz/046-n-julio-garcia-diaz-01.jpg", 
+            "046-julio-garcia-diaz/046-p-julio-garcia-diaz-01.jpg"
         ], 
         "_id": 46, 
         "TYPE": "building", 
@@ -593,9 +593,9 @@
         "LONGITUDE": -66.049097, 
         "LATITUDE": 18.402179, 
         "IMAGES": [
-            "images/047-luis-pales-matos/047-n-luis-pales-matos-01.jpg", 
-            "images/047-luis-pales-matos/047-n-luis-pales-matos-02.jpg", 
-            "images/047-luis-pales-matos/047-p-luis-pales-matos-01.jpg"
+            "047-luis-pales-matos/047-n-luis-pales-matos-01.jpg", 
+            "047-luis-pales-matos/047-n-luis-pales-matos-02.jpg", 
+            "047-luis-pales-matos/047-p-luis-pales-matos-01.jpg"
         ], 
         "_id": 47, 
         "TYPE": "building", 
@@ -607,7 +607,7 @@
         "LONGITUDE": -66.05016, 
         "LATITUDE": 18.405973, 
         "IMAGES": [
-            "images/048-merenderos/048-n-merenderos-01.jpg"
+            "048-merenderos/048-n-merenderos-01.jpg"
         ], 
         "_id": 48, 
         "TYPE": "building", 
@@ -619,7 +619,7 @@
         "LONGITUDE": -66.051202, 
         "LATITUDE": 18.404187, 
         "IMAGES": [
-            "images/049-museo-de-historia-antropologia-y-arte/049-n-museo-de-historia-antropologia-y-arte-01.jpg"
+            "049-museo-de-historia-antropologia-y-arte/049-n-museo-de-historia-antropologia-y-arte-01.jpg"
         ], 
         "_id": 49, 
         "TYPE": "building", 
@@ -631,7 +631,7 @@
         "LONGITUDE": -66.05123, 
         "LATITUDE": 18.40293, 
         "IMAGES": [
-            "images/050-plaza-roman-baldorioty-de-castro/050-n-plaza-roman-baldorioty-de-castro-01.jpg"
+            "050-plaza-roman-baldorioty-de-castro/050-n-plaza-roman-baldorioty-de-castro-01.jpg"
         ], 
         "_id": 50, 
         "TYPE": "building", 
@@ -643,7 +643,7 @@
         "LONGITUDE": -66.052304, 
         "LATITUDE": 18.404633, 
         "IMAGES": [
-            "images/052-plaza-universitaria-torre-central/052-n-plaza-universitaria-torre-central-01.jpg"
+            "052-plaza-universitaria-torre-central/052-n-plaza-universitaria-torre-central-01.jpg"
         ], 
         "_id": 51, 
         "TYPE": "building", 
@@ -655,7 +655,7 @@
         "LONGITUDE": -66.052343, 
         "LATITUDE": 18.40406, 
         "IMAGES": [
-            "images/052-plaza-universitaria-torre-central/052-n-plaza-universitaria-torre-central-01.jpg"
+            "052-plaza-universitaria-torre-central/052-n-plaza-universitaria-torre-central-01.jpg"
         ], 
         "_id": 52, 
         "TYPE": "building", 
@@ -667,7 +667,7 @@
         "LONGITUDE": -66.052391, 
         "LATITUDE": 18.403329, 
         "IMAGES": [
-            "images/052-plaza-universitaria-torre-central/052-n-plaza-universitaria-torre-central-01.jpg"
+            "052-plaza-universitaria-torre-central/052-n-plaza-universitaria-torre-central-01.jpg"
         ], 
         "_id": 53, 
         "TYPE": "building", 
@@ -679,7 +679,7 @@
         "LONGITUDE": -66.050737, 
         "LATITUDE": 18.405667, 
         "IMAGES": [
-            "images/054-radio-universidad/054-n-radio-universidad-01.jpg"
+            "054-radio-universidad/054-n-radio-universidad-01.jpg"
         ], 
         "_id": 54, 
         "TYPE": "building", 
@@ -691,8 +691,8 @@
         "LONGITUDE": -66.049133, 
         "LATITUDE": 18.406277, 
         "IMAGES": [
-            "images/055-ramon-emeterio-betances/055-n-ramon-emeterio-betances-01.jpg", 
-            "images/055-ramon-emeterio-betances/055-n-ramon-emeterio-betances-02.jpg"
+            "055-ramon-emeterio-betances/055-n-ramon-emeterio-betances-01.jpg", 
+            "055-ramon-emeterio-betances/055-n-ramon-emeterio-betances-02.jpg"
         ], 
         "_id": 55, 
         "TYPE": "building", 
@@ -704,7 +704,7 @@
         "LONGITUDE": -66.04673, 
         "LATITUDE": 18.402571, 
         "IMAGES": [
-            "images/056-residencia-campus/056-n-residencia-campus-01.jpg"
+            "056-residencia-campus/056-n-residencia-campus-01.jpg"
         ], 
         "_id": 56, 
         "TYPE": "building", 
@@ -716,7 +716,7 @@
         "LONGITUDE": -66.052792, 
         "LATITUDE": 18.403284, 
         "IMAGES": [
-            "images/057-residencia-plaza-universitaria/057-n-residencia-plaza-universitaria-01.jpg"
+            "057-residencia-plaza-universitaria/057-n-residencia-plaza-universitaria-01.jpg"
         ], 
         "_id": 57, 
         "TYPE": "building", 
@@ -728,7 +728,7 @@
         "LONGITUDE": -66.052757, 
         "LATITUDE": 18.402557, 
         "IMAGES": [
-            "images/058-residencia-torre-del-norte/058-n-residencia-torre-del-norte-01.jpg"
+            "058-residencia-torre-del-norte/058-n-residencia-torre-del-norte-01.jpg"
         ], 
         "_id": 58, 
         "TYPE": "building", 
@@ -740,7 +740,7 @@
         "LONGITUDE": -66.042309, 
         "LATITUDE": 18.40387, 
         "IMAGES": [
-            "images/059-residencias-de-la-facultad/059-n-residencias-de-la-facultad-01.jpg"
+            "059-residencias-de-la-facultad/059-n-residencias-de-la-facultad-01.jpg"
         ], 
         "_id": 59, 
         "TYPE": "building", 
@@ -752,7 +752,7 @@
         "LONGITUDE": -66.048759, 
         "LATITUDE": 18.404895, 
         "IMAGES": [
-            "images/060-residencia-del-rector/060-n-residencia-del-rector-01.jpg"
+            "060-residencia-del-rector/060-n-residencia-del-rector-01.jpg"
         ], 
         "_id": 60, 
         "TYPE": "building", 
@@ -764,8 +764,8 @@
         "LONGITUDE": -66.050077, 
         "LATITUDE": 18.402711, 
         "IMAGES": [
-            "images/061-roman-baldorioty-de-castro/061-n-roman-baldorioty-de-castro-01.jpg", 
-            "images/061-roman-baldorioty-de-castro/061-p-roman-baldorioty-de-castro-01.jpg"
+            "061-roman-baldorioty-de-castro/061-n-roman-baldorioty-de-castro-01.jpg", 
+            "061-roman-baldorioty-de-castro/061-p-roman-baldorioty-de-castro-01.jpg"
         ], 
         "_id": 61, 
         "TYPE": "building", 
@@ -777,7 +777,7 @@
         "LONGITUDE": -66.042801, 
         "LATITUDE": 18.406921, 
         "IMAGES": [
-            "images/062-rotc/062-n-rotc-01.jpg"
+            "062-rotc/062-n-rotc-01.jpg"
         ], 
         "_id": 62, 
         "TYPE": "building", 
@@ -789,8 +789,8 @@
         "LONGITUDE": -66.049869, 
         "LATITUDE": 18.40226, 
         "IMAGES": [
-            "images/063-sebastian-gonzalez-garcia/063-n-sebastian-gonzalez-garcia-01.jpg", 
-            "images/063-sebastian-gonzalez-garcia/063-p-sebastian-gonzalez-garcia-01.jpg"
+            "063-sebastian-gonzalez-garcia/063-n-sebastian-gonzalez-garcia-01.jpg", 
+            "063-sebastian-gonzalez-garcia/063-p-sebastian-gonzalez-garcia-01.jpg"
         ], 
         "_id": 63, 
         "TYPE": "building", 
@@ -802,7 +802,7 @@
         "LONGITUDE": -66.049844, 
         "LATITUDE": 18.40282, 
         "IMAGES": [
-            "images/064-senado-academico/064-n-senado-academico-01.jpg"
+            "064-senado-academico/064-n-senado-academico-01.jpg"
         ], 
         "_id": 64, 
         "TYPE": "building", 
@@ -814,7 +814,7 @@
         "LONGITUDE": -66.047803, 
         "LATITUDE": 18.405292, 
         "IMAGES": [
-            "images/065-servicios-medicos/065-n-servicios-medicos-01.jpg"
+            "065-servicios-medicos/065-n-servicios-medicos-01.jpg"
         ], 
         "_id": 65, 
         "TYPE": "building", 
@@ -826,7 +826,7 @@
         "LONGITUDE": -66.045827,
         "LATITUDE": 18.4075871,
         "IMAGES": [
-            "images/066-taller-de-artes-industriales/066-n-taller-de-artes-industriales-01.jpg"
+            "066-taller-de-artes-industriales/066-n-taller-de-artes-industriales-01.jpg"
         ], 
         "_id": 66, 
         "TYPE": "building", 
@@ -838,7 +838,7 @@
         "LONGITUDE": -66.048783, 
         "LATITUDE": 18.402755, 
         "IMAGES": [
-            "images/067-teatro/067-n-teatro-01.jpg"
+            "067-teatro/067-n-teatro-01.jpg"
         ], 
         "_id": 67, 
         "TYPE": "building", 
@@ -850,8 +850,8 @@
         "LONGITUDE": -66.050163, 
         "LATITUDE": 18.402842, 
         "IMAGES": [
-            "images/068-torre/068-n-torre-01.jpg", 
-            "images/068-torre/068-n-torre-02.jpg"
+            "068-torre/068-n-torre-01.jpg", 
+            "068-torre/068-n-torre-02.jpg"
         ], 
         "_id": 68, 
         "TYPE": "building", 
