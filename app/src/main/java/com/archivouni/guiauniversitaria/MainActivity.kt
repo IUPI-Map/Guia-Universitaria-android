@@ -180,7 +180,8 @@ class MainActivity : AppCompatActivity(),
                 override fun onStateChanged(view: View, newState: Int) {
                     when (newState) {
                         BottomSheetBehavior.STATE_HIDDEN -> {
-                            mFocusedMarker?.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_icon))
+                            if (Util.currentRoutes.isEmpty())
+                                mFocusedMarker?.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_icon))
                         }
                     }
                 }
@@ -309,10 +310,19 @@ class MainActivity : AppCompatActivity(),
                                 filteredData.add(value)
                         }
                     }
-                    mViewAdapter = ListAdapter(filteredData.toTypedArray())
+                    filteredData.toTypedArray().apply {
+                        sortBy {
+                            (it?.tag as PointOfInterest).name
+                        }
+                    }
+                    mViewAdapter = ListAdapter(filteredData.toTypedArray().apply {
+                        sortBy {
+                            (it?.tag as PointOfInterest).name ?: ""
+                        }
+                    })
                     mRecyclerView.adapter = mViewAdapter
                 } else {
-                    println("Didn't find the element")
+                    mRecyclerView.adapter = ListAdapter(mData)
                 }
                 return true
             }
