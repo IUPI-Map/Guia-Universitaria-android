@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:backgroundTint="@color/colorPrimary"
+    android:orientation="vertical"
+    tools:context=".ContactActivity">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="24dp"
+        android:text="Entre su comentario o sugerencia sobre la aplicación"
+        android:textAlignment="textStart"
+        android:textAllCaps="false"
+        android:textSize="24sp" />
+
+    <!--EditText: Input the message-->
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/messageEt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:hint="Entre el mensaje"
+        android:minHeight="250dp" />
+
+    <!--Button: Launch existing mail clients to send email-->
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/sendEmailBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:text="Enviar correo" />
+</LinearLayout>

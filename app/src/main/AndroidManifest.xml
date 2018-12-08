@@ -34,7 +34,8 @@
 
         <activity
             android:name=".MainActivity"
-            android:label="@string/title_activity_main" >
+            android:label="@string/title_activity_main"
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
@@ -42,7 +43,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <activity android:name=".SettingsActivity" />
+        <activity android:name=".DetailsActivity" />
+        <activity android:name=".TutorialActivity" />
+        <activity android:name=".ContactActivity" />
     </application>
 
 </manifest>

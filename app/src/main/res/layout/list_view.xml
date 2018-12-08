@@ -6,9 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorBackground"
-    android:elevation="2dp"
+    android:elevation="8dp"
     app:behavior_hideable="true"
-    app:behavior_peekHeight="300dp"
     app:behavior_skipCollapsed="false"
     app:layout_behavior="@string/bottom_sheet_behavior">
 
@@ -16,14 +15,13 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="64dp"
-        android:elevation="4dp">
+        android:elevation="12dp">
 
         <androidx.appcompat.widget.SearchView
             android:id="@+id/search_bar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="8dp"
-            android:layout_above="@id/map"
             android:background="@color/colorItem"
             android:queryHint="Search here"
             android:clickable="true"
@@ -47,7 +45,8 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_margin="8dp"
-        android:elevation="0dp"
+        android:clickable="true"
+        android:focusable="true"
         app:layout_constraintTop_toBottomOf="@id/barrier_search_recyclerview"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

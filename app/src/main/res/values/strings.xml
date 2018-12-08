@@ -1,8 +1,22 @@
 <resources>
     <string name="app_name">Guia Universitaria</string>
-    <string name="title_activity_main">Main</string>
+    <string name="title_activity_main">IUPI MAP</string>
     <string name="search_hint">Search here</string>
     <string name="permission_rationale_location">Requesting permission to get location</string>
     <string name="permission_required_toast">TOAST</string>
     <string name="location_permission_denied">location denied</string>
+    <string name="calculating_route_toast">Calculating route . . .</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="details">¡Bienvenidos!\n
+        IupiMap es el mapa del Recinto de Río Piedras de la UPR, donde puedes encontrar los edificios, su historia y otros puntos de interés. Un proyecto del Archivo Universitario del Recinto de Río Piedras.\n
+        - - - - - - - - - - - -\n
+        Acerca del Archivo Universitario y esta plataforma:\n
+        El Archivo Universitario (AU) desde el 1926 es responsable de custodiar el acervo histórico documental del Recinto de Río Piedras. Esta plataforma del mapa del Recinto de Río Piedras promueve el conocimiento a la historia de los edificios y espacios del Recinto.\n
+        - - - - - - - - - - - -\n
+        Esta aplicación fue una colaboración del curso CCOM-4030 y los estudiantes José G. Vélez Gómez, Marc A. De Jesús Ellsworth, José A. Quiñones Flores y Roberto C. López Rivera.\n
+        - - - - - - - - - - - -\n
+        Aida I. Irizarry Martínez, Directora y Administradora de Documentos del AU Si tienes alguna sugerencia favor de enviar un correo electrónico a: aida.irizarry@upr.edu\n
+        - - - - - - - - - - - -\n
+        Fotografías e información: Archivo Universitario, Archivo de Arquitectura y Construcción.\n</string>
 </resources>

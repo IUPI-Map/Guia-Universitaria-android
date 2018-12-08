@@ -44,7 +44,7 @@ class PointOfInterest(json: String): JSONObject(json) {
         private const val TAG_TYPE = "TYPE"
         private const val TAG_NAME = "NAME"
 
-        enum class TYPE {
+        enum class Type {
             DEFAULT,
             BUILDING,
             ARTWORK
@@ -53,9 +53,9 @@ class PointOfInterest(json: String): JSONObject(json) {
 
     val id: Int = getInt(TAG_ID)
     val type = when(getString(TAG_TYPE)) {
-        "building" -> TYPE.BUILDING
-        "artwork" -> TYPE.ARTWORK
-        else -> TYPE.DEFAULT
+        "building" -> Type.BUILDING
+        "artwork" -> Type.ARTWORK
+        else -> Type.DEFAULT
     }
     val name: String? = if(getString(TAG_NAME) != "null") getString(TAG_NAME) else null
     val description: String? = if(getString(TAG_DESCRIPTION) != "null") getString(TAG_DESCRIPTION) else null

@@ -1,5 +1,6 @@
 package com.archivouni.guiauniversitaria
 
+import android.app.Activity
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.Log
@@ -12,6 +13,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import android.os.AsyncTask
+import android.view.inputmethod.InputMethodManager
 import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
@@ -27,22 +29,17 @@ import kotlin.Exception
 
 
 // This object hold project-wide constants and methods
-object Util{
+object Util {
     private const val TAG = "Util"
 
     //region Project-wide Constants
-    const val IMAGE_SERVER_URL = "http://ec2-18-220-11-214.us-east-2.compute.amazonaws.com/"
+    const val IMAGE_SERVER_URL = "http://ec2-18-220-11-214.us-east-2.compute.amazonaws.com/images/"
     const val GOOGLE_API_URL = "https://maps.googleapis.com/maps/api/directions/"
-    // const val MAP_TILES_DIRECTORY = "map_tiles_bmp"
-
-    const val LOCATION_REQUEST_INTERVAL = 10L
-    const val LOCATION_REQUEST_FASTEST_INTERVAL = 5L
-
 
     //endregion
 
     //region Util Constants
-    private const val POLYLINE_WIDTH = 40f
+    private const val POLYLINE_WIDTH = 20f
     private const val POLYLINE_COLOR = Color.BLACK
     // End cap options: square, round, butt (default)
     private const val POLYLINE_START_CAP = "round"
@@ -50,16 +47,24 @@ object Util{
     // Joint type options: bevel, round, default
     private const val POLYLINE_JOINT_TYPE = JointType.BEVEL
     // Pattern options: gap, dash, dot, solid (default)
-    private const val POLYLINE_STROKE_PATTERN = "dot"
+    private const val POLYLINE_STROKE_PATTERN = "solid"
     private const val POLYLINE_STROKE_LENGTH = 16f
 
     private const val CONNECT_TIMEOUT = 15
     private const val READ_TIMEOUT = 15
     //endregion
 
-
     private val cachedRoutes = HashMap<String, Polyline>()
     var currentRoutes = MutableList<Polyline?>(0) { null }
+
+    // Hide android soft keyboard
+    // https://stackoverflow.com/questions/1109022/close-hide-the-android-soft-keyboard
+    fun hideKeyboard(activity: Activity) {
+        val imm = activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        val view = activity.currentFocus ?: View(activity)
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
+        view.clearFocus()
+    }
 
     fun bindTextToView(data: String?, textView: TextView?) {
         if (textView == null) {
@@ -114,8 +119,6 @@ object Util{
 
     object DirectionsJSONParser {
         private const val TAG_ROUTES = "routes"
-        private const val TAG_LEGS = "legs"
-        private const val TAG_STEPS = "steps"
         private const val TAG_OVERVIEW_POLYLINE = "overview_polyline"
         private const val TAG_POINTS="points"
 
@@ -125,7 +128,7 @@ object Util{
             try {
                 jRoutes = jObject.getJSONArray(TAG_ROUTES)
                 if (jRoutes.length() > 0) {
-                    val overviewPolyline = (jRoutes.get(0) as JSONObject).getJSONObject(TAG_OVERVIEW_POLYLINE)
+                    val overviewPolyline = (jRoutes[0] as JSONObject).getJSONObject(TAG_OVERVIEW_POLYLINE)
                     val encodedPoints = overviewPolyline.getString(TAG_POINTS)
                     return PolyUtil.decode(encodedPoints)
                 } else {
@@ -185,6 +188,7 @@ object Util{
 
     // Fetches data from url passed
     class DownloadTask(private val map: GoogleMap): AsyncTask<String, Void, String?>() {
+        // TODO: Give progress updates
         private lateinit var url: String
 
         // Downloading data in non-ui thread
@@ -197,7 +201,7 @@ object Util{
             if (this.isCancelled)
                 return null
 
-            Log.d(TAG, "Downloading json from $url")
+            Log.d("$TAG.DownloadTask", "Downloading json from $url")
             // For storing data from web service
             var data: String? = null
 
@@ -205,12 +209,10 @@ object Util{
                 // Fetching the data from web service
                 data = downloadUrl(url)
             } catch (e: UnknownHostException) {
-                Log.e(TAG, "Unable to connect to host: $url")
+                Log.e("$TAG.DownloadTask", "Unable to connect to host: $url")
             } catch (e: Exception) {
-                Log.d("Tag", e.toString())
+                Log.d("$TAG.DownloadTask", e.toString())
             }
-
-            Log.d(TAG, "Data: $data")
             return data
         }
 
@@ -284,14 +286,18 @@ object Util{
                     "square" -> SquareCap()
                     else -> ButtCap()
                 })
-                .pattern(List(points!!.size) {
-                    when (POLYLINE_STROKE_PATTERN) {
-                        "dash" -> Dash(POLYLINE_STROKE_LENGTH)
-                        "gap" -> Gap(POLYLINE_STROKE_LENGTH)
-                        "dot" -> Dot()
-                        else -> null
-                    }
-                })
                 .jointType(POLYLINE_JOINT_TYPE)
+                .apply {
+                    if (POLYLINE_STROKE_PATTERN != "solid") {
+                        pattern(List(points!!.size) {
+                            when (POLYLINE_STROKE_PATTERN) {
+                                "dash" -> Dash(POLYLINE_STROKE_LENGTH)
+                                "gap" -> Gap(POLYLINE_STROKE_LENGTH)
+                                "dot" -> Dot()
+                                else -> null
+                            }
+                        })
+                    }
+                }
     }
 }
