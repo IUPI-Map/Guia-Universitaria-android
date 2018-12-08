@@ -35,11 +35,11 @@
 
         <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/info_route_button"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:layout_margin="4dp"
             android:layout_weight="1"
-            android:src="@android:drawable/ic_menu_mylocation"/>
+            android:src="@drawable/ic_route_icon"/>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 

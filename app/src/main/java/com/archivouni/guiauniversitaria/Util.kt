@@ -1,5 +1,6 @@
 package com.archivouni.guiauniversitaria
 
+import android.app.Activity
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.Log
@@ -12,6 +13,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import android.os.AsyncTask
+import android.view.inputmethod.InputMethodManager
 import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
@@ -54,6 +56,15 @@ object Util {
 
     private val cachedRoutes = HashMap<String, Polyline>()
     var currentRoutes = MutableList<Polyline?>(0) { null }
+
+    // Hide android soft keyboard
+    // https://stackoverflow.com/questions/1109022/close-hide-the-android-soft-keyboard
+    fun hideKeyboard(activity: Activity) {
+        val imm = activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        val view = activity.currentFocus ?: View(activity)
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
+        view.clearFocus()
+    }
 
     fun bindTextToView(data: String?, textView: TextView?) {
         if (textView == null) {
