@@ -31,7 +31,7 @@ object Util {
     private const val TAG = "Util"
 
     //region Project-wide Constants
-    const val IMAGE_SERVER_URL = "http://ec2-18-220-11-214.us-east-2.compute.amazonaws.com/"
+    const val IMAGE_SERVER_URL = "http://ec2-18-220-11-214.us-east-2.compute.amazonaws.com/images/"
     const val GOOGLE_API_URL = "https://maps.googleapis.com/maps/api/directions/"
 
     const val LOCATION_REQUEST_INTERVAL = 10L
