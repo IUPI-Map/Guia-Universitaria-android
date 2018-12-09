@@ -10,7 +10,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.DialogFragment
-import java.util.jar.Manifest
 
 object PermissionUtils {
     fun requestPermission(activity: AppCompatActivity, requestId: Int, permission: String, finishActivity: Boolean) {

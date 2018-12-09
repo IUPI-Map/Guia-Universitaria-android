@@ -1,13 +1,11 @@
 package com.archivouni.guiauniversitaria
 
 import android.content.Intent
-import android.graphics.Bitmap
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
-import com.google.android.gms.maps.model.BitmapDescriptor
+import androidx.appcompat.app.AppCompatActivity
 
 class TutorialActivity : AppCompatActivity() {
 

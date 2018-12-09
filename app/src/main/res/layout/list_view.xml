@@ -23,13 +23,11 @@
             android:layout_height="match_parent"
             android:layout_margin="8dp"
             android:background="@color/colorItem"
-            android:queryHint="Search here"
+            android:queryHint="@string/search_hint"
             android:clickable="true"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            app:iconifiedByDefault="false"
-
-            />
+            app:iconifiedByDefault="false" />
 
     </androidx.appcompat.widget.Toolbar>
 

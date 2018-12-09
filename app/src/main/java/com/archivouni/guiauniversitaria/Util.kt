@@ -1,33 +1,27 @@
 package com.archivouni.guiauniversitaria
 
 import android.app.Activity
-import android.graphics.Bitmap
 import android.graphics.Color
-import android.graphics.Paint
+import android.os.AsyncTask
 import android.util.Log
 import android.view.View
-import android.view.ViewTreeObserver
+import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.TextView
-import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.model.*
+import com.google.maps.android.PolyUtil
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
-import android.os.AsyncTask
-import android.view.inputmethod.InputMethodManager
+import org.json.JSONArray
+import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
-import com.google.android.gms.maps.model.*
-import com.google.maps.android.PolyUtil
-import com.squareup.picasso.Transformation
-import org.json.JSONArray
-import org.json.JSONObject
 import java.net.UnknownHostException
 import java.util.*
-import kotlin.Exception
 
 
 // This object hold project-wide constants and methods

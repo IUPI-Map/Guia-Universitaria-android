@@ -40,7 +40,8 @@
             android:layout_height="80dp"
             android:layout_margin="4dp"
             android:layout_weight="1"
-            android:src="@drawable/ic_route_icon"/>
+            android:background="@color/colorTransparent"
+            android:src="@drawable/route_icon"/>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
