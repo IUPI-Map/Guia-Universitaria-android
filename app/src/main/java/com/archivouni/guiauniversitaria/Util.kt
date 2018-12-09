@@ -1,6 +1,7 @@
 package com.archivouni.guiauniversitaria
 
 import android.app.Activity
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.Log
@@ -21,6 +22,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import com.google.android.gms.maps.model.*
 import com.google.maps.android.PolyUtil
+import com.squareup.picasso.Transformation
 import org.json.JSONArray
 import org.json.JSONObject
 import java.net.UnknownHostException
@@ -36,6 +38,8 @@ object Util {
     const val IMAGE_SERVER_URL = "http://ec2-18-220-11-214.us-east-2.compute.amazonaws.com/images/"
     const val GOOGLE_API_URL = "https://maps.googleapis.com/maps/api/directions/"
 
+    const val IMAGE_WIDTH = 700
+    const val IMAGE_HEIGHT = 500
     //endregion
 
     //region Util Constants
@@ -80,11 +84,9 @@ object Util {
         }
     }
 
-    fun loadImageIntoView(url: String,
-                          imageView: ImageView?,
+    fun loadImageIntoView(url: String, imageView: ImageView?,
                           fit: Boolean = false,
-                          width: Int = 500,
-                          height: Int = 500,
+                          width: Int = 500, height: Int = 500,
                           callback: Callback = LoadImageCallback()) {
         if (imageView == null) {
             Log.e("Data Binding", "Imageview not found")

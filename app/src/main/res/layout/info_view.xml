@@ -19,6 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:elevation="12dp"
         android:weightSum="8">
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -43,65 +44,40 @@
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/info_image"
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/info_view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_marginStart="11dp"
+        android:layout_marginEnd="13dp"
+        android:layout_marginBottom="0dp"
+        android:elevation="12dp"/>
+
+    <me.relex.circleindicator.CircleIndicator
+        android:id="@+id/info_circle_page_indicator"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:elevation="12dp"
+        app:ci_drawable="@android:color/black"/>
+
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:fillViewport="true"
+        android:elevation="12dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:textSize="16sp"
-        android:text="Acronym"/>
-
-    <RelativeLayout
-        android:layout_width="360dp"
-        android:layout_height="118dp"
-        android:clickable="true"
-        android:focusable="true">
-
-        <androidx.viewpager.widget.ViewPager
-            android:id="@+id/pager"
-            android:layout_width="360dp"
-            android:layout_height="118dp"
-            android:layout_alignBottom="@+id/indicator"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginStart="11dp"
-            android:layout_marginEnd="13dp"
-            android:layout_marginBottom="0dp" />
-
-        <com.viewpagerindicator.CirclePageIndicator
-            android:id="@+id/indicator"
-            android:layout_width="360dp"
-            android:layout_height="118dp"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:gravity="bottom"
-            android:padding="10dip" />
-    </RelativeLayout>
-
-    <androidx.core.widget.NestedScrollView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
+        android:nestedScrollingEnabled="true" >
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/info_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:background="@drawable/rounded_corners"
-            android:text="Informacion O Detallaes\nDonec quam ante, commodo et finibus eu, finibus nec felis. Fusce tellus nibh, rhoncus quis felis at, vestibulum aliquet nunc. Etiam eget eros ultrices, suscipit turpis in, congue ipsum. Ut bibendum vulputate finibus. Morbi fermentum sem vitae lectus imperdiet luctus. Sed quis nisi turpis. Morbi eget enim eros. Cras nec consectetur est. Aliquam tellus velit, fringilla ut erat id, rutrum fermentum est. Praesent lobortis, nunc eget ornare semper, nisi ipsum ultricies lacus, et tincidunt felis tortor a turpis. Fusce rutrum nec velit a vehicula. Donec eu dolor et enim condimentum iaculis nec in libero. Pellentesque massa lorem, accumsan a felis ut, efficitur cursus quam. Nulla sed faucibus dolor, quis semper purus. Integer iaculis purus ut libero dignissim egestas. Etiam commodo ornare nulla. " />
+            android:padding="4dp"
+            android:background="@drawable/rounded_corners" />
 
-    </androidx.core.widget.NestedScrollView>
-
-    <!--<androidx.appcompat.widget.AppCompatTextView-->
-        <!--android:id="@+id/info_details"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_marginStart="8dp"-->
-        <!--android:layout_marginEnd="8dp"-->
-        <!--android:text="Informacion O Detalles\nDonec quam ante, commodo et finibus eu, finibus nec felis. Fusce tellus nibh, rhoncus quis felis at, vestibulum aliquet nunc. Etiam eget eros ultrices, suscipit turpis in, congue ipsum. Ut bibendum vulputate finibus. Morbi fermentum sem vitae lectus imperdiet luctus. Sed quis nisi turpis. Morbi eget enim eros. Cras nec consectetur est. Aliquam tellus velit, fringilla ut erat id, rutrum fermentum est. Praesent lobortis, nunc eget ornare semper, nisi ipsum ultricies lacus, et tincidunt felis tortor a turpis. Fusce rutrum nec velit a vehicula. Donec eu dolor et enim condimentum iaculis nec in libero. Pellentesque massa lorem, accumsan a felis ut, efficitur cursus quam. Nulla sed faucibus dolor, quis semper purus. Integer iaculis purus ut libero dignissim egestas. Etiam commodo ornare nulla. " />-->
+    </ScrollView>
 
 </androidx.appcompat.widget.LinearLayoutCompat>

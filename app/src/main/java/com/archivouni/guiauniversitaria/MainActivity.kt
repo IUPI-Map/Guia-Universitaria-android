@@ -21,6 +21,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager.widget.ViewPager
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.*
@@ -30,8 +31,8 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import me.relex.circleindicator.CircleIndicator
 import java.lang.Exception
-import java.util.ArrayList
 
 class MainActivity : AppCompatActivity(),
         OnMapReadyCallback,
@@ -101,6 +102,10 @@ class MainActivity : AppCompatActivity(),
     private lateinit var mInfoView: View
     private lateinit var mInfoViewBehavior: BottomSheetBehavior<*>
 
+    private lateinit var mViewPager: ViewPager
+    private lateinit var mPagerAdapter: SlidingImageAdapter
+    private lateinit var mCirclePageIndicator: CircleIndicator
+
     private lateinit var mRecyclerView: RecyclerView
     private lateinit var mViewAdapter: RecyclerView.Adapter<*>
     private lateinit var mViewManager: RecyclerView.LayoutManager
@@ -155,6 +160,9 @@ class MainActivity : AppCompatActivity(),
             peekHeight = INFO_VIEW_PEEK_HEIGHT
             setBottomSheetCallback(InfoViewBottomSheetCallback())
         }
+
+        mViewPager = findViewById(R.id.info_view_pager)
+        mCirclePageIndicator = findViewById(R.id.info_circle_page_indicator)
 
         mInfoRouteButton = findViewById(R.id.info_route_button)
         mCloseRouteButton = findViewById(R.id.button_close_route)
@@ -286,42 +294,34 @@ class MainActivity : AppCompatActivity(),
 
     //region UI Functions
     private fun bindInfoToView(poi: PointOfInterest) {
-        val imageView = findViewById<ImageView>(R.id.info_image)
-        if (poi.images != null) {
-            imageView.visibility = View.VISIBLE
-            // TODO: Use image slider for all images instead of single image
-            Util.loadImageIntoView(Util.IMAGE_SERVER_URL + poi.images[0],
-                    imageView,
-                    IMAGE_FIT_TO_VIEW,
-                    IMAGE_WIDTH,
-                    IMAGE_HEIGHT)
-        } else {
-            imageView.visibility = View.GONE
-        }
+
         Util.bindTextToView(poi.name, findViewById(R.id.info_name))
-//        bindTextToView(poi.acronym, view.findViewById(R.id.info_acronym))
+        // Util.bindTextToView(poi.acronym, findViewById(R.id.info_acronym))
         Util.bindTextToView(poi.description, findViewById(R.id.info_description))
+
+        if (poi.images != null) {
+            mViewPager.visibility = View.VISIBLE
+            mCirclePageIndicator.visibility = View.VISIBLE
+            val imageUrls = poi.images.map { path ->
+                Util.IMAGE_SERVER_URL + path
+            }.toTypedArray()
+
+            mPagerAdapter = SlidingImageAdapter(this, imageUrls)
+            mViewPager.adapter = mPagerAdapter
+            mCirclePageIndicator.setViewPager(mViewPager)
+        } else {
+            mViewPager.visibility = View.GONE
+            mCirclePageIndicator.visibility = View.GONE
+        }
+
         if (mCanGetLocation) {
             bindRouteToButton(mInfoRouteButton, mLastKnownLatLng!!, poi.latLng!!)
         }
         mMap.setPadding(0, 0, 0, INFO_VIEW_PEEK_HEIGHT)
     }
 
-    private fun getDirectionsUrl(origin: LatLng, dest: LatLng): String {
-        val strOrigin = "origin=${origin.latitude},${origin.longitude}"
-        val strDest = "destination=${dest.latitude},${dest.longitude}"
-        val mode = if (mapBounds.contains(origin)) "mode=walking&avoid=highways" else "mode=driving"
-        val params = "$strOrigin&$strDest&$mode"
-        val output = "json"
-        return "${Util.GOOGLE_API_URL}$output?$params&key=" +
-                packageManager.getApplicationInfo(packageName,
-                        PackageManager.GET_META_DATA)
-                        .metaData
-                        .getString("com.google.android.geo.API_KEY")
-    }
-
     inner class ListAdapter(val data: Array<Marker?>) : RecyclerView.Adapter<ListAdapter.POIViewHolder>() {
-        // Class defining list item view holder defined in list_item_layout.xml
+        // Class defining list item view holder defined in list_item
         inner class POIViewHolder(poiView: View): RecyclerView.ViewHolder(poiView) {
             var nameView = poiView.findViewById<TextView?>(R.id.poi_name)
             var acronymView = poiView.findViewById<TextView?>(R.id.poi_acronym)
@@ -334,7 +334,7 @@ class MainActivity : AppCompatActivity(),
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): POIViewHolder {
             val layoutInflater = LayoutInflater.from(parent.context)
-            val listItem = layoutInflater.inflate(R.layout.list_item_layout, parent, false)
+            val listItem = layoutInflater.inflate(R.layout.list_item, parent, false)
             return POIViewHolder(listItem)
         }
 
@@ -652,6 +652,19 @@ class MainActivity : AppCompatActivity(),
             if (poi.acronym != null)
                 autoComplete[Pair(poi.id, poi.acronym)] = marker
         }
+    }
+
+    private fun getDirectionsUrl(origin: LatLng, dest: LatLng): String {
+        val strOrigin = "origin=${origin.latitude},${origin.longitude}"
+        val strDest = "destination=${dest.latitude},${dest.longitude}"
+        val mode = if (mapBounds.contains(origin)) "mode=walking&avoid=highways" else "mode=driving"
+        val params = "$strOrigin&$strDest&$mode"
+        val output = "json"
+        return "${Util.GOOGLE_API_URL}$output?$params&key=" +
+                packageManager.getApplicationInfo(packageName,
+                        PackageManager.GET_META_DATA)
+                        .metaData
+                        .getString("com.google.android.geo.API_KEY")
     }
 
     // Sets listener route button to display route on click
