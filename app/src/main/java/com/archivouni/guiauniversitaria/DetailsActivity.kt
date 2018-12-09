@@ -1,9 +1,7 @@
 package com.archivouni.guiauniversitaria
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.TextView
-import kotlinx.android.synthetic.main.activity_details.*
+import androidx.appcompat.app.AppCompatActivity
 
 class DetailsActivity : AppCompatActivity() {
 
