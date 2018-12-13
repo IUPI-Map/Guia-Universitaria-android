@@ -6,6 +6,8 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import kotlinx.android.synthetic.main.activity_tutorial.*
+
 
 class TutorialActivity : AppCompatActivity() {
 
@@ -50,6 +52,56 @@ class TutorialActivity : AppCompatActivity() {
             if (mCurrentScreen == 0)
                 it.visibility = View.GONE
         }
+//        if (mCurrentScreen == 1){
+//
+//            textTutorial01.visibility = View.VISIBLE
+//            textTutorial02.visibility = View.INVISIBLE
+//            textTutorial03.visibility = View.INVISIBLE
+//            textTutorial04.visibility = View.INVISIBLE
+//            textTutorial05.visibility = View.INVISIBLE
+//            textTutorial06.visibility = View.INVISIBLE
+//        }
+//        else if(mCurrentScreen == 2){
+//            textTutorial02.visibility = View.VISIBLE
+//            textTutorial01.visibility = View.INVISIBLE
+//            textTutorial03.visibility = View.INVISIBLE
+//            textTutorial04.visibility = View.INVISIBLE
+//            textTutorial05.visibility = View.INVISIBLE
+//            textTutorial06.visibility = View.INVISIBLE
+//        }
+//        else if(mCurrentScreen == 3){
+//            textTutorial03.visibility = View.VISIBLE
+//            textTutorial01.visibility = View.INVISIBLE
+//            textTutorial02.visibility = View.INVISIBLE
+//            textTutorial04.visibility = View.INVISIBLE
+//            textTutorial05.visibility = View.INVISIBLE
+//            textTutorial06.visibility = View.INVISIBLE
+//        }
+//        else if(mCurrentScreen == 4){
+//            textTutorial04.visibility = View.VISIBLE
+//            textTutorial01.visibility = View.INVISIBLE
+//            textTutorial02.visibility = View.INVISIBLE
+//            textTutorial03.visibility = View.INVISIBLE
+//            textTutorial05.visibility = View.INVISIBLE
+//            textTutorial06.visibility = View.INVISIBLE
+//        }
+//        else if(mCurrentScreen == 5){
+//            textTutorial05.visibility = View.VISIBLE
+//            textTutorial01.visibility = View.INVISIBLE
+//            textTutorial02.visibility = View.INVISIBLE
+//            textTutorial04.visibility = View.INVISIBLE
+//            textTutorial03.visibility = View.INVISIBLE
+//            textTutorial06.visibility = View.INVISIBLE
+//        }
+//        else{
+//            textTutorial06.visibility = View.VISIBLE
+//            textTutorial01.visibility = View.INVISIBLE
+//            textTutorial02.visibility = View.INVISIBLE
+//            textTutorial04.visibility = View.INVISIBLE
+//            textTutorial05.visibility = View.INVISIBLE
+//            textTutorial03.visibility = View.INVISIBLE
+//        }
+
         mQuitButton = findViewById(R.id.tutorial_quit_button)
         mQuitButton.setOnClickListener {
             startActivity(Intent(this, MainActivity::class.java))
