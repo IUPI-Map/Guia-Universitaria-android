@@ -41,7 +41,7 @@
             android:layout_margin="4dp"
             android:layout_weight="1"
             android:background="@color/colorTransparent"
-            android:src="@drawable/ic_arrow_forward"/>
+            android:src="@drawable/route_icon"/>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
