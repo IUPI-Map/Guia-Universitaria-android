@@ -134,6 +134,7 @@ class MainActivity : AppCompatActivity(),
         updateValuesFromBundle(savedInstanceState)
         createLocationCallback()
 
+        // User_Story #1
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
@@ -144,6 +145,8 @@ class MainActivity : AppCompatActivity(),
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build()
+        // User_Story#1 end
+
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
@@ -175,13 +178,14 @@ class MainActivity : AppCompatActivity(),
                 unfocusMarker()
             mCloseRouteButton.visibility = View.GONE
         }
-
+    //User_Story#5
         mListViewButton = findViewById(R.id.button_open_list)
         mListViewButton.setOnClickListener {
             // Open list view on click
             mInfoViewBehavior.state = BottomSheetBehavior.STATE_HIDDEN
             mListViewBehavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
+    //User_Story#5 end
 
         mSettingsButton = findViewById(R.id.button_open_settings)
         mSettingsButton.setOnClickListener {
@@ -217,6 +221,7 @@ class MainActivity : AppCompatActivity(),
     }
     //endregion
 
+    // User_Story#1
     //region Map Functions
     /**
      * Manipulates the map once available.
@@ -248,6 +253,8 @@ class MainActivity : AppCompatActivity(),
                 }.toTypedArray()
 
         Log.d(TAG, "POIs read from json: ${mData.size}")
+    //User_Story#1 end
+
 
         /*****************RECYCLER_VIEW BEGINS**********************/
         /**
@@ -267,6 +274,8 @@ class MainActivity : AppCompatActivity(),
         val searchBar: SearchView = findViewById(R.id.search_bar)
         searchBar.setOnQueryTextListener(SearchBarOnQueryTextListener())
 
+
+        //User_Story#1
         /*****************MY_LOCATION LOGIC BEGINS**********************/
         enableMyLocation()
 
@@ -289,16 +298,20 @@ class MainActivity : AppCompatActivity(),
 
         mMap.setOnMarkerClickListener(this)
         //endregion
-    }
+    }//User_Story#1 end
+
     //endregion
 
     //region UI Functions
+    //User_Story#4
     private fun bindInfoToView(poi: PointOfInterest) {
 
         Util.bindTextToView(poi.name, findViewById(R.id.info_name))
         // Util.bindTextToView(poi.acronym, findViewById(R.id.info_acronym))
         Util.bindTextToView(poi.description, findViewById(R.id.info_description))
+     //User_Story#4 end
 
+        //User_Story#16
         if (poi.images != null) {
             mViewPager.visibility = View.VISIBLE
             mCirclePageIndicator.visibility = View.VISIBLE
@@ -319,7 +332,8 @@ class MainActivity : AppCompatActivity(),
         }
         mMap.setPadding(0, 0, 0, INFO_VIEW_PEEK_HEIGHT)
     }
-
+    //User_Story#16 end
+    //User_Story#4
     inner class ListAdapter(val data: Array<Marker?>) : RecyclerView.Adapter<ListAdapter.POIViewHolder>() {
         // Class defining list item view holder defined in list_item
         inner class POIViewHolder(poiView: View): RecyclerView.ViewHolder(poiView) {
@@ -355,7 +369,7 @@ class MainActivity : AppCompatActivity(),
             }
             Log.d(TAG, "Successfully bound ${poi.name} to pos: $pos")
         }
-    }
+    }   //User_Story#4 end
     //endregion
 
     //region Permission Functions
@@ -518,6 +532,7 @@ class MainActivity : AppCompatActivity(),
     //endregion
 
     //region Event Listeners
+    //User_Story#28
     override fun onMarkerClick(marker: Marker?): Boolean {
         unfocusMarker()
         focusMarker(marker)
@@ -539,6 +554,7 @@ class MainActivity : AppCompatActivity(),
         Log.d(TAG, "Focused marker: ${(mFocusedMarker?.tag as PointOfInterest).name ?: "none"}")
         return true
     }
+    //End User_Story#28
 
     /**
      * # Listener for autocompleting search in list view
@@ -549,6 +565,7 @@ class MainActivity : AppCompatActivity(),
      *
      * @see ListAdapter
      */
+    //User_Story#12
     private inner class SearchBarOnQueryTextListener: SearchView.OnQueryTextListener {
         override fun onQueryTextSubmit(query: String?): Boolean {
             return false
@@ -581,6 +598,7 @@ class MainActivity : AppCompatActivity(),
             return true
         }
     }
+    //User_story#12 end
 
     /**
      * # Listener for changes in info view bottom sheet
