@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Guia Universitaria</string>
+    <string name="app_name">IUPI MAP</string>
     <string name="title_activity_main">IUPI MAP</string>
     <string name="search_hint">Search here</string>
     <string name="permission_rationale_location">Requesting permission to get location</string>
@@ -7,7 +7,6 @@
     <string name="location_permission_denied">location denied</string>
     <string name="calculating_route_toast">Calculating route . . .</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="details">¡Bienvenidos!\n
         IupiMap es el mapa del Recinto de Río Piedras de la UPR, donde puedes encontrar los edificios, su historia y otros puntos de interés. Un proyecto del Archivo Universitario del Recinto de Río Piedras.\n
         - - - - - - - - - - - -\n
