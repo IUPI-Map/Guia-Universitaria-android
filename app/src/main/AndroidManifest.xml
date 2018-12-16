@@ -49,10 +49,6 @@
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
         </activity>
-        <activity android:name=".SettingsActivity" />
-        <activity android:name=".DetailsActivity" />
-        <activity android:name=".TutorialActivity" />
-        <activity android:name=".ContactActivity" />
     </application>
 
 </manifest>
