@@ -19,6 +19,7 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
@@ -266,6 +267,9 @@ class MainActivity : AppCompatActivity(),
         mRecyclerView = findViewById<RecyclerView>(R.id.recycler_view).apply {
             // Recycler view options
             setHasFixedSize(true)
+            addItemDecoration(DividerItemDecoration(this@apply.context, DividerItemDecoration.HORIZONTAL).apply{
+                setDrawable(this@MainActivity.getDrawable(R.drawable.line_divider)!!)
+            })
             layoutManager = mViewManager
             adapter = mViewAdapter
         }
