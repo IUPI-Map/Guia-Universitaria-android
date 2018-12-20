@@ -27,6 +27,7 @@
             android:clickable="true"
             android:focusable="true"
             android:focusableInTouchMode="true"
+            android:backgroundTint="@color/colorBackground"
             app:iconifiedByDefault="false" />
 
     </androidx.appcompat.widget.Toolbar>
