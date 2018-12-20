@@ -41,7 +41,7 @@
             android:layout_margin="4dp"
             android:layout_weight="1"
             android:background="@color/colorTransparent"
-            android:src="@mipmap/route_icon"/>
+            android:src="@mipmap/ruta"/>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 

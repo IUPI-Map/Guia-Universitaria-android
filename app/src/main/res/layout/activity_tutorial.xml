@@ -21,27 +21,28 @@
         android:id="@+id/tutorial_quit_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_cancel_icon"
+        android:layout_marginTop="16dp"
         android:backgroundTint="@color/colorTransparent"
+        android:src="@drawable/ic_cancel_icon"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/tutorial_button_prev"
-        android:layout_width="wrap_content"
-        android:layout_height="51dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_width="87dp"
+        android:layout_height="67dp"
+        android:layout_marginTop="496dp"
         android:backgroundTint="@color/colorTransparent"
         android:src="@drawable/ic_arrow_back"
         android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tutorial_button_next" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/tutorial_button_next"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
         android:backgroundTint="@color/colorTransparent"
         android:src="@drawable/ic_arrow_forward"
         app:layout_constraintBottom_toTopOf="@id/guideline"
