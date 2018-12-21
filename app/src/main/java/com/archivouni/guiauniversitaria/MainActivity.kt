@@ -273,7 +273,6 @@ class MainActivity : AppCompatActivity(),
             layoutManager = mViewManager
             adapter = mViewAdapter
         }
-
         preloadAutocomplete()
         val searchBar: SearchView = findViewById(R.id.search_bar)
         searchBar.setOnQueryTextListener(SearchBarOnQueryTextListener())
