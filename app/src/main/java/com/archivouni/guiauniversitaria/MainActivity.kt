@@ -19,6 +19,7 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
@@ -266,10 +267,12 @@ class MainActivity : AppCompatActivity(),
         mRecyclerView = findViewById<RecyclerView>(R.id.recycler_view).apply {
             // Recycler view options
             setHasFixedSize(true)
+            addItemDecoration(DividerItemDecoration(this@apply.context, DividerItemDecoration.HORIZONTAL).apply{
+                setDrawable(this@MainActivity.getDrawable(R.drawable.line_divider)!!)
+            })
             layoutManager = mViewManager
             adapter = mViewAdapter
         }
-
         preloadAutocomplete()
         val searchBar: SearchView = findViewById(R.id.search_bar)
         searchBar.setOnQueryTextListener(SearchBarOnQueryTextListener())
@@ -689,7 +692,7 @@ class MainActivity : AppCompatActivity(),
     private fun bindRouteToButton(view: ImageButton, origin: LatLng, dest: LatLng) {
         val url = getDirectionsUrl(origin, dest)
         view.setOnClickListener {
-            Toast.makeText(this, R.string.calculating_route_toast, Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@MainActivity, R.string.calculating_route_toast, Toast.LENGTH_SHORT).show()
             Util.currentRoutes.forEach { polyline ->
                 polyline?.remove()
             }
