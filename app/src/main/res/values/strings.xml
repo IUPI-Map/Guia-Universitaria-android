@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">IUPI MAP</string>
     <string name="title_activity_main">IUPI MAP</string>
+    <string name="default_font">serif</string>
+
     <string name="search_hint">Search here</string>
     <string name="permission_rationale_location">Requesting permission to get location</string>
     <string name="permission_required_toast">TOAST</string>

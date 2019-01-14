@@ -692,7 +692,7 @@ class MainActivity : AppCompatActivity(),
     private fun bindRouteToButton(view: ImageButton, origin: LatLng, dest: LatLng) {
         val url = getDirectionsUrl(origin, dest)
         view.setOnClickListener {
-            Toast.makeText(this, R.string.calculating_route_toast, Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@MainActivity, R.string.calculating_route_toast, Toast.LENGTH_SHORT).show()
             Util.currentRoutes.forEach { polyline ->
                 polyline?.remove()
             }
